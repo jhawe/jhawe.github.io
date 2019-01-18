@@ -1,7 +1,6 @@
 ---
-layout: home
-excerpt: "I should really write a meaningful excerpt here"
-tags: [blog]
----
+# Feel free to add content and custom Front Matter to this file.
+# To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 
-Home of Johann Hawe - multi-ician
+layout: home
+---
