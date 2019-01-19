@@ -1,0 +1,158 @@
+---
+title: "Analysis of SkillCraft Kaggle dataset"
+date: "January 19, 2019"
+excerpt: "Exploratory analysis of the SkillCraft Kaggle dataset using tidyverse"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(ggplot2)
+library(reshape2)
+library(knitr)
+```
+
+## Introduction
+
+Ah, this brings me back.
+To be honest, this dataset wasn't quite selected at random, but rather I stumbled upon it whilst browsing Kaggle.
+I've been enthusiastic about StarCraft II and even it's predecessor StarCraft for a long time, although not so much in recent time due to a significant lack of time/setting higher priorities for it.
+So, naturally, when I saw the *SkillCraft* dataset from Kaggle (see https://www.kaggle.com/danofer/skillcraft) I had to check it out :)
+
+StarCraft II (or SC2) is a real time strategy (RTS) game which has a large community and even professional leagues.
+Before the start of each game you can pick one of three races (or select one at random) and you start by constructing a base of research and construction facilities. The ultimate goal of each (regular) match is then to either 
+
+1 Destroy all buildings of your opponent or
+2 Your opponent forfits the game (i. e., craft a situation from which it is clear that your opponent has no more chance of winning)
+
+Let's check it out!
+
+## Data exploration
+```{r data_prep, message=FALSE}
+sc <- read_csv("../datasets/SkillCraft.csv")
+```
+The datasets contains `r ncol(sc)` columns and `r nrow(sc)` rows.
+Unfortunately the dataset does not have any more detailed description other 
+than the column names.
+In the rest of the analysis I'll assume that 'GameID' is actually 'GamerID',
+and that the collected stats are summaries over the gamer's game history.
+
+
+Let's get a feel for the data, just check for any missing values and
+get summary stats per column.
+```{r}
+kable(sc %>% 
+  group_by(LeagueIndex) %>%
+  summarise_all(.funs=function(x) {sum(is.na(x) | x=="?" | x == "")}))
+```
+
+Within the game there are 'leagues' which are encoded in these data with number from 1-7 (7 being the highest league).
+We first replace these values with some more 'speaking' names.
+```{r, echo=T}
+league_names <- c("Bronze", "Silver", "Gold", "Platinum", "Diamond", "Master", "GrandMaster")
+# we convert to ordered factors for nicer plotting
+league_names <- factor(league_names, levels=league_names, ordered = T)
+sc <- sc %>% mutate(LeagueIndex=league_names[LeagueIndex])
+```
+
+We now create a basic overview per league, melting the data frame for easier
+plotting on the way.
+```{r overview_plots, echo=T}
+# prep the data
+sc_melted <- melt(sc)
+# set a less obtrusive style
+theme_set(theme_bw())
+
+# plot overviews
+
+# overall number of players per league
+league_summary <- sc %>% group_by(LeagueIndex) %>% summarise(count=n())
+ggplot(league_summary, aes(y=count, x=LeagueIndex, fill=LeagueIndex)) + 
+  geom_bar(stat="identity") + ggtitle("Number of players per league")
+
+# age
+ggplot(sc, aes(x=Age)) + 
+  geom_histogram(stat = "density") + 
+  facet_wrap(~LeagueIndex, ncol=3) + ggtitle("Age by League")
+
+# apm
+ggplot(sc, aes(x=APM)) + 
+  geom_histogram(stat="density") + 
+  facet_wrap(~LeagueIndex, ncol=3) + ggtitle("APM by League")
+
+# HoursPerWeek
+ggplot(sc, aes(x=HoursPerWeek)) + 
+  geom_histogram(stat="density") + 
+  facet_wrap(~LeagueIndex, ncol=3) + ggtitle("Hours per week by League")
+```
+Above we can see some interesting stuff already.
+
+
+Now let's check the total hours played.
+```{r totalhours}
+# TotalHours
+ggplot(sc, aes(x=TotalHours)) + 
+  geom_histogram(stat="density") + 
+  facet_wrap(~LeagueIndex, ncol=3) + ggtitle("Total Hours by League")
+
+```
+Whoops, this seems kinda odd, we can't really see anything. There are some player who seem to have played an
+extraordinary amount of time. Let's quickly check it in log-space.
+```{r totalhours_log}
+# TotalHours
+ggplot(sc_melted %>% filter(variable=="TotalHours"), aes(x=log10(value))) + 
+  geom_histogram(stat="density") + 
+  facet_wrap(~LeagueIndex, ncol=3) + ggtitle("Total Hours by League")
+
+```
+This looks better now. It seems that overall there is not too much of a difference between the idnividual
+leagues.
+Let's check again on the TotalHours, first a summary both in log-space and actual values.
+```{r totalhours_overall}
+sc <- sc %>% mutate(TotalHoursLog = log10(TotalHours))
+ggplot(sc, aes(x=TotalHours)) + geom_histogram() + ggtitle("Total hours played over all players")
+ggplot(sc, aes(x=TotalHoursLog)) + geom_histogram() + ggtitle("log10 Total hours played over all players")
+
+# sort by total hours played and show the top of the list
+sc %>% arrange(desc(TotalHours))
+```
+Crazy. There is one player with the age of 18 who has apparently a total of 1,000,000 played hours, and quite high APM.
+
+Let's check whether the APM correlate with the total hours played. We remove this extreme outlier
+first, since this one might mess up the plot.
+
+```{r apm_vs_totalhours}
+sc_sub <- sc %>% filter(TotalHours<max(TotalHours))
+ggplot(sc_sub, aes(x=TotalHours, y=APM, col=LeagueIndex)) + 
+  geom_point() + ggtitle("Total hours played versus APM")
+```
+Interesting. We can see that apparently, in the lower leagues in general the
+APM seem to be a little lower than in the higher leagues, but it doesn't seem
+like the APM are high only for players who have played the game exceedingly
+long.
+
+Let's briefly check whether higher APM correlate with higher league placement.
+```{r apm_totalhours_leagueindex}
+# get our two variables and filter out the extreme TotalHours outlier
+sc_sub <- sc_melted %>% filter(variable %in% c("TotalHours", "APM")) %>%
+  filter(value < max(value))
+ggplot(sc_sub, aes(x=LeagueIndex, y=value, fill=LeagueIndex)) + geom_violin() + 
+  facet_wrap( ~ variable, nrow=2, scales="free") + 
+  ggtitle("APM and TotalHours stratified by LeagueIndex")
+
+# do a simple linear model to see whether LeagueIndex is indicative 
+# of the APM and TotalHours
+lm_apm <- lm(APM~LeagueIndex, data=sc)
+lm_thours <- lm(TotalHours~LeagueIndex, data=sc)
+
+print("Summary for APM model:")
+summary(lm_apm)
+print("Summary for TotalHours model:")
+summary(lm_thours)
+
+```
+
+## Session Info
+```{r session_info}
+sessionInfo()
+```
