@@ -13,7 +13,7 @@
 # you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
-title: Data Analysis by Johann Hawe
+title: A Data Analysis Blog
 title_separator: "|"
 locale: en-US
 name: Johann Hawe
