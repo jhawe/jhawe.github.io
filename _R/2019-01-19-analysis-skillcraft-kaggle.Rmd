@@ -2,33 +2,34 @@
 title: "Analysis of SkillCraft Kaggle dataset"
 date: "January 19, 2019"
 excerpt: "Exploratory analysis of the SkillCraft Kaggle dataset using tidyverse"
+toc: true
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(ggplot2)
 library(reshape2)
 library(knitr)
 ```
 
-## Introduction
+# Introduction
 
 Ah, this brings me back.
 To be honest, this dataset wasn't quite selected at random, but rather I stumbled upon it whilst browsing Kaggle.
-I've been enthusiastic about StarCraft II and even it's predecessor StarCraft for a long time, although not so much in recent time due to a significant lack of time/setting higher priorities for it.
+I've been enthusiastic about StarCraft II and even of its predecessor StarCraft for a long time, although recently I didn't play/watch any games due to a significant lack of time/setting higher priorities for it.
 So, naturally, when I saw the *SkillCraft* dataset from Kaggle (see https://www.kaggle.com/danofer/skillcraft) I had to check it out :)
 
 StarCraft II (or SC2) is a real time strategy (RTS) game which has a large community and even professional leagues.
 Before the start of each game you can pick one of three races (or select one at random) and you start by constructing a base of research and construction facilities. The ultimate goal of each (regular) match is then to either 
 
-1 Destroy all buildings of your opponent or
-2 Your opponent forfits the game (i. e., craft a situation from which it is clear that your opponent has no more chance of winning)
+1. Destroy all buildings of your opponent or
+2. Your opponent forfits the game (i. e., craft a situation from which it is clear that your opponent has no more chance of winning)
 
 Let's check it out!
 
-## Data exploration
-```{r data_prep, message=FALSE}
+# Data exploration
+```{r data_prep, message=FALSE, echo=F}
 sc <- read_csv("../datasets/SkillCraft.csv")
 ```
 The datasets contains `r ncol(sc)` columns and `r nrow(sc)` rows.
@@ -40,103 +41,164 @@ and that the collected stats are summaries over the gamer's game history.
 
 Let's get a feel for the data, just check for any missing values and
 get summary stats per column.
-```{r}
+```{r sanity_check}
 kable(sc %>% 
   group_by(LeagueIndex) %>%
   summarise_all(.funs=function(x) {sum(is.na(x) | x=="?" | x == "")}))
 ```
 
-Within the game there are 'leagues' which are encoded in these data with number from 1-7 (7 being the highest league).
-We first replace these values with some more 'speaking' names.
-```{r, echo=T}
-league_names <- c("Bronze", "Silver", "Gold", "Platinum", "Diamond", "Master", "GrandMaster")
+Within the game there are 'leagues' which are encoded in these data with numbers from 1-7 (7 being the highest league).
+We don't like this representation very much, let's repace it with some more 'speaking' names.
+
+```{r rename_leagues}
+league_names <- c("Bronze", "Silver", "Gold", "Platinum", 
+                  "Diamond", "Master", "GrandMaster")
 # we convert to ordered factors for nicer plotting
-league_names <- factor(league_names, levels=league_names, ordered = T)
+league_names <- factor(league_names, 
+                       levels=league_names, 
+                       ordered = T)
+
 sc <- sc %>% mutate(LeagueIndex=league_names[LeagueIndex])
 ```
 
-We now create a basic overview per league, melting the data frame for easier
-plotting on the way.
-```{r overview_plots, echo=T}
-# prep the data
-sc_melted <- melt(sc)
+## Per league overviews
+
+### General overview
+
+Let's create a basic overview per league.
+
+```{r overview_plots}
 # set a less obtrusive style
 theme_set(theme_bw())
 
 # plot overviews
 
 # overall number of players per league
-league_summary <- sc %>% group_by(LeagueIndex) %>% summarise(count=n())
-ggplot(league_summary, aes(y=count, x=LeagueIndex, fill=LeagueIndex)) + 
-  geom_bar(stat="identity") + ggtitle("Number of players per league")
+league_summary <- sc %>% 
+  group_by(LeagueIndex) %>% 
+  summarise(count=n())
+
+ggplot(league_summary, 
+       aes(y=count, x=LeagueIndex, fill=LeagueIndex)) + 
+  geom_bar(stat="identity") + 
+  ggtitle("Number of players per league")
 
 # age
 ggplot(sc, aes(x=Age)) + 
   geom_histogram(stat = "density") + 
-  facet_wrap(~LeagueIndex, ncol=3) + ggtitle("Age by League")
+  facet_wrap(~LeagueIndex, ncol=3) + 
+  ggtitle("Age by League")
 
 # apm
 ggplot(sc, aes(x=APM)) + 
   geom_histogram(stat="density") + 
-  facet_wrap(~LeagueIndex, ncol=3) + ggtitle("APM by League")
+  facet_wrap(~LeagueIndex, ncol=3) + 
+  ggtitle("APM by League")
 
 # HoursPerWeek
 ggplot(sc, aes(x=HoursPerWeek)) + 
   geom_histogram(stat="density") + 
-  facet_wrap(~LeagueIndex, ncol=3) + ggtitle("Hours per week by League")
+  facet_wrap(~LeagueIndex, ncol=3) + 
+  ggtitle("Hours per week by League")
 ```
+
 Above we can see some interesting stuff already.
+TODO
 
-
-Now let's check the total hours played.
+### Total hours played 
+Now let's check the total hours played over all players, again we first check by league.
 ```{r totalhours}
 # TotalHours
 ggplot(sc, aes(x=TotalHours)) + 
   geom_histogram(stat="density") + 
-  facet_wrap(~LeagueIndex, ncol=3) + ggtitle("Total Hours by League")
+  facet_wrap(~LeagueIndex, ncol=3) + 
+  ggtitle("Total Hours by League")
 
 ```
+
 Whoops, this seems kinda odd, we can't really see anything. There are some player who seem to have played an
 extraordinary amount of time. Let's quickly check it in log-space.
+
 ```{r totalhours_log}
 # TotalHours
-ggplot(sc_melted %>% filter(variable=="TotalHours"), aes(x=log10(value))) + 
+ggplot(sc, aes(x=log10(TotalHours))) + 
   geom_histogram(stat="density") + 
-  facet_wrap(~LeagueIndex, ncol=3) + ggtitle("Total Hours by League")
+  facet_wrap(~LeagueIndex, ncol=3) + 
+  ggtitle("Total Hours by League")
 
 ```
-This looks better now. It seems that overall there is not too much of a difference between the idnividual
+
+This looks better now. It seems that overall there is not too much of a difference between the individual
 leagues.
-Let's check again on the TotalHours, first a summary both in log-space and actual values.
+Let's check again on the TotalHours, let's get the table and sort it by TotalHours, decreasingly.
+
 ```{r totalhours_overall}
-sc <- sc %>% mutate(TotalHoursLog = log10(TotalHours))
-ggplot(sc, aes(x=TotalHours)) + geom_histogram() + ggtitle("Total hours played over all players")
-ggplot(sc, aes(x=TotalHoursLog)) + geom_histogram() + ggtitle("log10 Total hours played over all players")
-
 # sort by total hours played and show the top of the list
-sc %>% arrange(desc(TotalHours))
-```
-Crazy. There is one player with the age of 18 who has apparently a total of 1,000,000 played hours, and quite high APM.
+kable(head(sc %>% arrange(desc(TotalHours))))
 
+# define our maximum for total_hours (10 years)
+max_totalhours <- 10*365.25*24
+```
+
+Crazy. There is one player (age 18!) who has apparently a total of 1,000,000 played hours, and quite high APM.
+Let's do the math, shall we? So 1,000,000 hours, that would be like 41,666 days and about 114 years. Not bad, but
+I think for the sake of our further analysis we should filter out unreasonable total hours (as I mentioned, it might be we did not
+interpret the data correctly, too).
+Anyways, before doing any more analysis, we remove all players with TotalHours > `r max_totalhours`, which would 
+be about 10 years.
+
+```{r totalhours_filtered}
+sc <- sc %>% 
+  filter(TotalHours<max_totalhours) %>% 
+  mutate(TotalHoursLog=log10(TotalHours))
+
+# plot again
+ggplot(sc, aes(x=TotalHours)) + 
+  geom_histogram() + 
+  ggtitle("Total hours played over all players")
+ggplot(sc, aes(x=TotalHoursLog)) + 
+  geom_histogram() + 
+  ggtitle("log10 Total hours played over all players")
+
+```
+
+Ah, this looks much better now!
+
+### APM for and TotalHours are indicative of league placement
 Let's check whether the APM correlate with the total hours played. We remove this extreme outlier
-first, since this one might mess up the plot.
+first, since this would mess up the plot.
 
-```{r apm_vs_totalhours}
-sc_sub <- sc %>% filter(TotalHours<max(TotalHours))
-ggplot(sc_sub, aes(x=TotalHours, y=APM, col=LeagueIndex)) + 
-  geom_point() + ggtitle("Total hours played versus APM")
+```{r apm_totalhours_vs_leagueindex}
+ggplot(sc, 
+       aes(x=TotalHours, y=APM, col=LeagueIndex)) + 
+  geom_point() + 
+  ggtitle("Total hours played versus APM")
 ```
+
 Interesting. We can see that apparently, in the lower leagues in general the
 APM seem to be a little lower than in the higher leagues, but it doesn't seem
 like the APM are high only for players who have played the game exceedingly
-long.
+long. To get a less crowded picture, let's do the same plot again in log-space
+for the TotalHours.
 
-Let's briefly check whether higher APM correlate with higher league placement.
+```{r apm_totalhours_vs_leagueindex_log}
+ggplot(sc, 
+       aes(x=TotalHoursLog, y=APM, col=LeagueIndex)) + 
+  geom_point() + 
+  ggtitle("Total hours played versus APM")
+```
+
+Let's briefly check whether higher APM and TotalHours values correlate with 
+higher league placement.
+
 ```{r apm_totalhours_leagueindex}
 # get our two variables and filter out the extreme TotalHours outlier
-sc_sub <- sc_melted %>% filter(variable %in% c("TotalHours", "APM")) %>%
-  filter(value < max(value))
-ggplot(sc_sub, aes(x=LeagueIndex, y=value, fill=LeagueIndex)) + geom_violin() + 
+sc_sub <- sc %>% 
+  select(GameID, LeagueIndex, TotalHours, APM)
+sc_sub <- melt(sc_sub, id.vars = c("GameID", "LeagueIndex"))
+ggplot(sc_sub, 
+       aes(x=LeagueIndex, y=value, fill=LeagueIndex)) + 
+  geom_violin() + 
   facet_wrap( ~ variable, nrow=2, scales="free") + 
   ggtitle("APM and TotalHours stratified by LeagueIndex")
 
@@ -152,7 +214,96 @@ summary(lm_thours)
 
 ```
 
-## Session Info
+## Predicting league placement
+
+```{r pca}
+library(randomForest)
+
+# check a trained model on the complete set
+complete <- randomForest(LeagueIndex ~ ., data=sc, ntree = 10000)
+print(complete)
+```
+
+```{r classification, cache=T}
+# create a random sampling of the data for 10-fold cross validation
+# NOTE: we should do some label stratification here
+# NOTE: also, we have different number of samples per label!
+sc <- sc %>% mutate(cv_subset = sample(1:10, nrow(sc), T))
+
+result <- lapply(unique(sc$cv_subset), function(subset) {
+  # training set
+  train <- filter(sc, cv_subset != subset)
+  # test set
+  test <- filter(sc, cv_subset == subset)
+  
+  # build random forest
+  rf <- randomForest(LeagueIndex ~ ., data=train, 
+                     ntree=10000)
+  
+  # get and return predictions on test-test
+  prediction <- predict(rf, test)
+  mutate(test, predicted = prediction)
+})
+
+sc <- bind_rows(result)
+```
+
+
+### Performance
+An interesting property of this problem now is that it is no standard classficiation
+problem with two classes, but rather one with 7 classes getting predicted.
+So to evaluate the performance we use the F1 score, but adopted
+to multi-class predictions (we are doing a weighted average of the F1 scores as
+calculated for the individual classes).
+
+```{r f1_def}
+f1 <- function(y, y_hat) {
+  # get a f1 measure for each label
+  # write it out explicetely
+  labels <- unique(y)
+  fp <- tp <- fn <- tn <- 0
+  temp <- lapply(labels, function(l) {
+    # false positives
+    fp <<- fp + sum(y_hat == l & y != l)
+    # true positives
+    tp <<- tp + sum(y_hat == l & y == l)
+    # false negatives
+    fn <<- fn + sum(y_hat != l & y == l)
+    # true negatives
+    tn <<- tn + sum(y_hat != l & y != l)
+  })
+  
+  # precision
+  prec <- tp / (tp + fp)
+  
+  # recall
+  rec <- tp / (tp + fn)
+  
+  # f1
+  f1 <-2 * (prec * rec)/(prec + rec)
+
+  # return  f1
+  f1
+
+  return(f1)
+}
+```
+
+Now we calculated the weighted F1-score for our predictions:
+
+```{r f1}
+f1 <- f1(as.character(sc$LeagueIndex), 
+                  as.character(sc$predicted))
+f1
+
+```
+
+Wonderful! So we see that the performance isn't too bad if we take all the available features into account and with 10-fold cross validation.
+
+### Feature importance
+
+
+# Session Info
 ```{r session_info}
 sessionInfo()
 ```
