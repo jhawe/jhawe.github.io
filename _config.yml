@@ -13,13 +13,13 @@
 # you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
-title: Analyzed - A Data Analysis Blog
+title: Analyzed! - A Data Analysis Blog
 title_separator: "|"
 locale: en-US
 name: Johann Hawe
 email: johann.hawe@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
-         Analysis of public KAGGLE datasets in R.
+         Analysis of public (KAGGLE) datasets in R.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://jhawe.github.io/" # the base hostname & protocol for your site, e.g. http://example.com
 github_username: jhawe
@@ -47,6 +47,13 @@ plugins:
 paginate: 10 # amount of posts to show
 paginate_path: /page:num/
 
+comments:
+  provider: "disqus"
+  disqus:
+    shortname: "analyzed"
+
+timezone: "Europe/Berlin"
+
 defaults:
   # _posts
   - scope:
@@ -59,7 +66,6 @@ defaults:
       comments: true
       share: true
       related: true
-      classes: wide
       toc: true
   # _pages
   - scope:
@@ -69,16 +75,27 @@ defaults:
       layout: single
       author_profile: true
       classes: wide
+      comments: true
 
 author:
   name     : "Johann Hawe"
   avatar   : "/assets/images/avatar.png"
-  bio      : "PhD student (computational biology) at HelmholtzZentrum Munich."
+  bio      : "PhD student (computational biology)"
   location : "Munich, Germany"
 
 category_archive:
-  type: liquid
+  type: jekyll-archives
   path: /categories/
 tag_archive:
-  type: liquid
+  type: jekyll-archives
   path: /tags/
+jekyll-archives:
+  enabled:
+    - categories
+    - tags
+  layouts:
+    category: archive-taxonomy
+    tag: archive-taxonomy
+  permalinks:
+    category: /categories/:name/
+    tag: /tags/:name/

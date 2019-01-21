@@ -17,11 +17,17 @@ library(knitr)
 
 # Introduction
 
-Ah, this brings me back.
-![Starcraft2 screenshot](https://bnetcmsus-a.akamaihd.net/cms/page_media/95QJHO5EOTPG1508778076429.jpg){:width="200px"}
-To be honest, this dataset wasn't quite selected at random, but rather I stumbled upon it whilst browsing Kaggle.
+![Starcraft II screenshot](https://bnetcmsus-a.akamaihd.net/cms/page_media/95QJHO5EOTPG1508778076429.jpg){:width="600px"}
+
+*In-game screenshot from StarCraft II*
+
+
+
+Ah, this brings me back!
+
+To be honest, this dataset wasn't selected at random, but rather I stumbled upon it whilst browsing Kaggle.
 I've been enthusiastic about [StarCraft II](https://starcraft2.com/en-us/) and even of its predecessor [StarCraft](https://starcraft.com/en-us/) for a long time, although recently I didn't play/watch any games due to a significant lack of time/setting higher priorities for it.
-So, naturally, when I saw the *SkillCraft* dataset from Kaggle ([link](https://www.kaggle.com/danofer/skillcraft)) I had to check it out :)
+So, naturally, when I saw the **SkillCraft** dataset from Kaggle ([link](https://www.kaggle.com/danofer/skillcraft)) I had to check it out :)
 
 ## StarCraft II
 StarCraft II (or SC2) is a real time strategy (RTS) game which has a large community and several professional leagues. 
@@ -37,7 +43,7 @@ and finding a delicate balance between developing their base, training an army a
 During the game, spectators can assess several statistics for each player.
 Amongst intuitive measures such as the amount of workers or units built, constructed buildings and 
 resources mined, other stats such as the APM (actions-per-minute) allow to assess a player's game activity or even skill.
-The dataset collected several such measures across the SCII, conveniently collected 
+The dataset collected several such measures across the SC2, conveniently collected 
 to be analyed by us, so let's check it out!
 
 # Data exploration
@@ -65,6 +71,7 @@ to certain events.
 ## Quick data quality check
 But first let's get a feel for the data, just check for any missing values and
 get summary stats per selected column.
+
 ```{r sanity_check}
 sc_sub <- sc %>% select(GameID, LeagueIndex, Age, TotalHours, APM, SelectByHotkeys, ActionLatency)
 kable(sc_sub %>% 
@@ -77,6 +84,7 @@ kable(sc_sub %>%
 Alright, the quick check does not reveal any major problems with the data, let's go on.
 Within the game there are 'leagues' which are encoded in these data with numbers from 1-7 (7 being the highest league).
 We don't like this representation very much, let's repace it with some more 'speaking' names.
+Note: We keep the correct order of the leagues which is helpful for understanding later plots.
 
 ```{r rename_leagues}
 league_names <- c("Bronze", "Silver", "Gold", "Platinum", 
@@ -90,7 +98,7 @@ sc_sub <- sc_sub %>% mutate(LeagueIndex=league_names[LeagueIndex])
 head(sc_sub)
 ```
 
-### General overview
+## General overview
 
 Ok, now that we've got some nice names for our leagues, let's create some basic 
 overview plots for our selected variables over the different leagues.
@@ -160,7 +168,7 @@ Now let's check on the TotalHours - wow, something's wrong here! Seems that
 some few player have an extraordinary amount of played hours on their back,
 we should look at this in more detail!
 
-### Total hours played 
+## Total hours played 
 Since we can't really see anything in the plot, we check the table for some outliers.
 We get the table and sort it by TotalHours, decreasingly.
 
@@ -207,7 +215,7 @@ ggplot(sc_sub, aes(x=TotalHoursLog)) +
 group_by(sc_sub, LeagueIndex) %>% summarise(mean(TotalHours))
 ```
 
-### APM, ActionLatency and TotalHours are indicative of league placement
+## LeagueIndex is indicative of APM, ActionLatency and TotalHours
 Let's check whether our favourite variables are determined by the player's
 current league placement.
 
@@ -228,7 +236,7 @@ ggplot(sc_sub,
 
 ```
 
-Ah, I like this plot, it shows quite some interesting information (and just looks kinda nice)! 
+Ah, I like this plot, it shows quite some interesting information (and just looks kinda fancy!). 
 We can see that in higher leagues in general the APM seem to be higher than in lower leagues, same for the TotalHours played.
 Similarly,  ActionLatency is lower in higher leagues, also somewhat correlating with the TotalHours played.
 
@@ -261,7 +269,11 @@ summary(lm_alatency)
 
 ```
 
-## Predicting league placement
+Here we can see that for each of the chosen variables, the LeagueIndex is indeed
+indicative of their values. We should explore this a bit more, but for now let's
+go on with predicting league placement!
+
+# Predicting league placement
 
 Ok, so far so good. Now let's do a quick try on predicting league placement
 from our selected variables. For now we just apply the randomForest approach
@@ -283,16 +295,17 @@ model <- randomForest(LeagueIndex ~ .,
 print(model)
 ```
 
-### Performance
+## Performance
 
 Wonderful! So we now fitted the random forest model, but what do we see here?
-Apparently we were not able to do a satisfying job here (out-of-bag error rate (OOB) around 64%!).
-That's disappointing. 
+Apparently we were not able to do a satisfying job (out-of-bag error rate (OOB) around 64%!).
+That's disappointing...
 
-### Mock predictions
-Looking at the confusion matrix we seem to be fairly 'close'
-with most predictions. Since this is just for fun, let's define new 'mock' league,
-deviding the player into 'good' and 'bad' ones. Maybe we can do better on this
+## Mock predictions
+Looking at the confusion matrix, however, we seem to be fairly 'close'
+with most predictions (if we assume that e.g. Silver league is similar to Bronze and Gold, etc.). 
+Since this analysis is just for fun, let's define new 'mock' leagues,
+deviding the player into 'good' and 'bad' ones. Maybe we can do better on these
 two classes case?
 
 ```{r mock_randomForest, cache=T}
@@ -306,9 +319,9 @@ model_mock <- randomForest(LeagueIndex ~ .,
 print(model_mock)
 ```
 
-As we can see now, the OOB is a lot better at about 22%! Well, it's something!
+As we can see the OOB is a lot better at about 22%! It's something!
 
-### Feature importance
+## Feature importance
 Finally, let's quickly check on the feature importance for the mock predictions.
 
 ```{r feature_importance}
@@ -316,12 +329,13 @@ model_mock$importance
 
 ```
 
-As we can see, the MeanDecreaseGini is highest for the ActionLatency, suggesting 
+The MeanDecreaseGini is highest for the ActionLatency, suggesting 
 that this variable is the most important one for predicting 'bad' and 'good' players
-in our mock prediction experiment.
+in our mock prediction experiment (the higher the index in general, the 'more important' the
+respective variable). 
 
-## Conclusion
-We have looked at some of the more intuitivy variables accessible in the SkillCraft
+# Conclusion
+We looked at some of the more intuitive variables accessible in the SkillCraft
 dataset and got a nice feel of the data using rather straight forward ggplot functionality.
 
 Overall, we were able to see that the league placement already gives a hint on the
@@ -339,6 +353,10 @@ and finally evaluating the results using e.g. the AUC or F1 measure.
 But for now we are happy with what we have done and can go on to the next task!
 
 Until then, farewell!
+
+-or-
+
+*Khas il'adare* - for anyone 'speaking' [Khalani](https://starcraft.fandom.com/wiki/Khalani)
 
 # Session Info
 ```{r session_info}
