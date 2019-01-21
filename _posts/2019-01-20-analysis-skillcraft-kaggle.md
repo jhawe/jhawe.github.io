@@ -313,8 +313,8 @@ ggplot(sc_sub, aes(x=TotalHoursLog)) +
 
 <img src="/assets/figures/2019-01-20-analysis-skillcraft-kaggle/totalhours_filtered-2.png" title="center" alt="center" style="display: block; margin: auto;" />
 
-Ah, this looks much better now! We can now see that we have only very few players
-who have about 20,000 (2.2815423), still crazy!
+Ah, this looks much more like it! We can now see that we have only very few players
+who have about 20,000 TotalHours (2.2815423 years), still crazy!
 Let's do the by-league plot once more (in log-space), and let's again look at the
 means:
 
@@ -353,11 +353,14 @@ group_by(sc_sub, LeagueIndex) %>% summarise(mean(TotalHours))
 ## 7 GrandMaster              1581.
 {% endhighlight %}
 
+Alright, this feeds our expectations! On average, if you play the game for a
+longer period of time, you will probably end up in a higher league.
+
 ## LeagueIndex is indicative of APM, ActionLatency and TotalHours
-Let's check whether our favourite variables are determined by the player's
+Let's check whether our favourite variables are indeed determined by the player's
 current league placement.
 
-First get an impression of whether high amount of hours played indicates a high
+First get an impression of whether a high amount of total hours played indicates a high
 APM or low ActionLatency. Again, we take the hours in log-space.
 
 
@@ -379,11 +382,11 @@ ggplot(sc_sub,
 
 <img src="/assets/figures/2019-01-20-analysis-skillcraft-kaggle/apm_totalhours_vs_leagueindex-2.png" title="center" alt="center" style="display: block; margin: auto;" />
 
-Ah, I like this plot, it shows quite some interesting information (and just looks kinda fancy!). 
+Ah, I like this plot, it allows us to extract some interesting information (and just looks fancy!). 
 We can see that in higher leagues in general the APM seem to be higher than in lower leagues, same for the TotalHours played.
 Similarly,  ActionLatency is lower in higher leagues, also somewhat correlating with the TotalHours played.
 
-Now let's look at this information a bit differently, doing fancy violin plots instead
+Now let's look at this information a bit differently, doing violin plots instead
 of these points.
 
 
