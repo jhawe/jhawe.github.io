@@ -27,8 +27,8 @@ So, naturally, when I saw the **SkillCraft** dataset from Kaggle ([link](https:/
 StarCraft II (or SC2) is a real time strategy (RTS) game which has a large community and several professional leagues. 
 Before the start of each game you can pick one of three races (or select one at random) and you start by constructing a base of research and construction facilities. The ultimate goal of each (regular) match is then to either 
 
-1. Destroy all buildings of your opponent or
-2. Your opponent forfits the game (i. e., craft a situation from which it is clear that your opponent has no more chance of winning)
+1. Destroy all your opponent's buildings  or
+2. Your opponent forfeits the game (i. e. craft a situation from which it is clear that your opponent has no more chance of winning)
 
 Players have to devise specialized strategies, frequently and quickly adjusting to their opponent's moves
 and finding a delicate balance between developing their base, training an army and mining resources (minerals and gas).
