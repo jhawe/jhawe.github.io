@@ -107,7 +107,8 @@ league_names <- factor(league_names,
                        levels=league_names, 
                        ordered = T)
 
-sc_sub <- sc_sub %>% mutate(LeagueIndex=league_names[LeagueIndex])
+sc_sub <- sc_sub %>% 
+  mutate(LeagueIndex=league_names[LeagueIndex])
 head(sc_sub)
 {% endhighlight %}
 
@@ -143,7 +144,9 @@ league_summary <- sc_sub %>%
   summarise(count=n())
 
 ggplot(league_summary, 
-       aes(y=count, x=LeagueIndex, fill=LeagueIndex)) + 
+       aes(y=count, 
+           x=LeagueIndex, 
+           fill=LeagueIndex)) + 
   geom_bar(stat="identity") + 
   ggtitle("Number of players per league")
 {% endhighlight %}
@@ -211,7 +214,9 @@ Overall, the mean of the distribution seems to wander from somewhere around 100 
 as we go from Bronze to GrandMaster, let's check this quickly:
 
 {% highlight r %}
-sc_sub %>% group_by(LeagueIndex) %>% summarize(mean(ActionLatency))
+sc_sub %>% 
+  group_by(LeagueIndex) %>% 
+  summarize(mean(ActionLatency))
 {% endhighlight %}
 
 
@@ -258,7 +263,8 @@ We get the table and sort it by TotalHours, decreasingly.
 
 {% highlight r %}
 # sort by total hours played and show the top of the list
-kable(head(sc_sub %>% arrange(desc(TotalHours))))
+kable(head(sc_sub %>% 
+             arrange(desc(TotalHours))))
 {% endhighlight %}
 
 
@@ -335,7 +341,8 @@ ggplot(sc_sub, aes(x=TotalHoursLog)) +
 <img src="/assets/figures/2019-01-20-analysis-skillcraft-kaggle/total_hours_fixed-1.png" title="center" alt="center" style="display: block; margin: auto;" />
 
 {% highlight r %}
-group_by(sc_sub, LeagueIndex) %>% summarise(mean(TotalHours))
+group_by(sc_sub, LeagueIndex) %>% 
+  summarise(mean(TotalHours))
 {% endhighlight %}
 
 
@@ -607,7 +614,7 @@ print(model)
 ## Performance
 
 Wonderful! So we now fitted the random forest model, but what do we see here?
-Apparently we were not able to do a satisfying job (out-of-bag error rate (OOB) around 64%!).
+Apparently, we were not able to do a satisfying job (out-of-bag error rate (OOB) around 64%!).
 That's disappointing...
 
 ## Mock predictions
@@ -615,7 +622,7 @@ Looking at the confusion matrix, however, we seem to be fairly 'close'
 with most predictions (if we assume that e.g. Silver league is similar to Bronze and Gold, etc.). 
 Since this analysis is just for fun, let's define new 'mock' leagues,
 deviding players into 'good' and 'bad' ones. Maybe we can do better on these
-two classes case?
+two classes?
 
 
 {% highlight r %}

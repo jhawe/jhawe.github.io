@@ -94,7 +94,8 @@ league_names <- factor(league_names,
                        levels=league_names, 
                        ordered = T)
 
-sc_sub <- sc_sub %>% mutate(LeagueIndex=league_names[LeagueIndex])
+sc_sub <- sc_sub %>% 
+  mutate(LeagueIndex=league_names[LeagueIndex])
 head(sc_sub)
 ```
 
@@ -115,7 +116,9 @@ league_summary <- sc_sub %>%
   summarise(count=n())
 
 ggplot(league_summary, 
-       aes(y=count, x=LeagueIndex, fill=LeagueIndex)) + 
+       aes(y=count, 
+           x=LeagueIndex, 
+           fill=LeagueIndex)) + 
   geom_bar(stat="identity") + 
   ggtitle("Number of players per league")
 
@@ -152,7 +155,9 @@ league have a low latency and hence quick reaction to events which would make se
 Overall, the mean of the distribution seems to wander from somewhere around 100 to maybe 30-40
 as we go from Bronze to GrandMaster, let's check this quickly:
 ```{r ActionLatency}
-sc_sub %>% group_by(LeagueIndex) %>% summarize(mean(ActionLatency))
+sc_sub %>% 
+  group_by(LeagueIndex) %>% 
+  summarize(mean(ActionLatency))
 ```
 
 Indeed, the higher the league the lower the ActionLatency.
@@ -176,7 +181,8 @@ We get the table and sort it by TotalHours, decreasingly.
 
 ```{r totalhours_overall}
 # sort by total hours played and show the top of the list
-kable(head(sc_sub %>% arrange(desc(TotalHours))))
+kable(head(sc_sub %>% 
+             arrange(desc(TotalHours))))
 
 # define our maximum for total_hours (10 years)
 max_totalhours <- 10*365.25*24
@@ -220,7 +226,8 @@ ggplot(sc_sub, aes(x=TotalHoursLog)) +
   facet_wrap(~LeagueIndex, ncol=3) + 
   ggtitle("Hours per week by League")
 
-group_by(sc_sub, LeagueIndex) %>% summarise(mean(TotalHours))
+group_by(sc_sub, LeagueIndex) %>% 
+  summarise(mean(TotalHours))
 ```
 
 Alright, this feeds our expectations! On average, if you are placed in a higher league
@@ -310,7 +317,7 @@ print(model)
 ## Performance
 
 Wonderful! So we now fitted the random forest model, but what do we see here?
-Apparently we were not able to do a satisfying job (out-of-bag error rate (OOB) around 64%!).
+Apparently, we were not able to do a satisfying job (out-of-bag error rate (OOB) around 64%!).
 That's disappointing...
 
 ## Mock predictions
@@ -318,7 +325,7 @@ Looking at the confusion matrix, however, we seem to be fairly 'close'
 with most predictions (if we assume that e.g. Silver league is similar to Bronze and Gold, etc.). 
 Since this analysis is just for fun, let's define new 'mock' leagues,
 deviding players into 'good' and 'bad' ones. Maybe we can do better on these
-two classes case?
+two classes?
 
 ```{r mock_randomForest, cache=T}
 mock_leagues <- factor(c(rep("bad",4), rep("good", 3)))
