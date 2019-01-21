@@ -43,8 +43,9 @@ and finding a delicate balance between developing their base, training an army a
 During the game, spectators can assess several statistics for each player.
 Amongst intuitive measures such as the amount of workers or units built, constructed buildings and 
 resources mined, other stats such as the APM (actions-per-minute) allow to assess a player's game activity or even skill.
-The dataset collected several such measures across the SC2, conveniently collected 
-to be analyed by us, so let's check it out!
+
+The dataset collected several such measures across the SC2 scene, conveniently collected 
+to be analyzed by us, so let's check it out!
 
 # Data exploration
 ```{r data_prep, message=FALSE, echo=F}
