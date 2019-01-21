@@ -249,7 +249,7 @@ ggplot(sc_sub, aes(x=TotalHours)) +
 
 <img src="/assets/figures/2019-01-20-analysis-skillcraft-kaggle/total_hours_overview-1.png" title="center" alt="center" style="display: block; margin: auto;" />
 
-Wow, something's wrong here! Seems that some few player have an extraordinary amount of played hours on their back, we should look at this in more detail!
+Wow, something's wrong here! Seems that some few players have an extraordinary amount of played hours on their back, we should look at this in more detail!
 
 ## Total hours played 
 Since we can't really see anything in the plot, we check the table for some outliers.
@@ -353,8 +353,9 @@ group_by(sc_sub, LeagueIndex) %>% summarise(mean(TotalHours))
 ## 7 GrandMaster              1581.
 {% endhighlight %}
 
-Alright, this feeds our expectations! On average, if you play the game for a
-longer period of time, you will probably end up in a higher league.
+Alright, this feeds our expectations! On average, if you are placed in a higher league
+it seems that you did play the game for a longer period of time than your fellow
+'lower-leagures'!
 
 ## LeagueIndex is indicative of APM, ActionLatency and TotalHours
 Let's check whether our favourite variables are indeed determined by the player's
@@ -382,7 +383,7 @@ ggplot(sc_sub,
 
 <img src="/assets/figures/2019-01-20-analysis-skillcraft-kaggle/apm_totalhours_vs_leagueindex-2.png" title="center" alt="center" style="display: block; margin: auto;" />
 
-Ah, I like this plot, it allows us to extract some interesting information (and just looks fancy!). 
+Ah, I like these plots, they allow us to extract some interesting information (and just look fancy!). 
 We can see that in higher leagues in general the APM seem to be higher than in lower leagues, same for the TotalHours played.
 Similarly,  ActionLatency is lower in higher leagues, also somewhat correlating with the TotalHours played.
 
@@ -613,7 +614,7 @@ That's disappointing...
 Looking at the confusion matrix, however, we seem to be fairly 'close'
 with most predictions (if we assume that e.g. Silver league is similar to Bronze and Gold, etc.). 
 Since this analysis is just for fun, let's define new 'mock' leagues,
-deviding the player into 'good' and 'bad' ones. Maybe we can do better on these
+deviding players into 'good' and 'bad' ones. Maybe we can do better on these
 two classes case?
 
 
