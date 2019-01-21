@@ -1,6 +1,10 @@
 # main links
 main:
+  - title: "Home"
+    url: /
+  - title: "SkillCraft"
+    url: /skillcraft/
+  - title: "Kaggle"
+    url: /kaggle/
   - title: "About"
-    url: /about
-  - title: "Quick-Start Guide"
-    url: https://mmistakes.github.io/minimal-mistakes/docs/quick-start-guide/
+    url: /about/

@@ -1,12 +1,14 @@
 ---
-title: "Analysis of SkillCraft Kaggle dataset"
-date: "January 19, 2019"
+title: "Analysis of the SkillCraft dataset"
+date: "January 20, 2019"
 excerpt: "Exploratory analysis of the SkillCraft Kaggle dataset using tidyverse"
+tags: "skillcraft starcraft2 gaming esports"
 toc: true
+permalink: /skillcraft/
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, fig.align="center", message = F)
 library(tidyverse)
 library(ggplot2)
 library(reshape2)
@@ -216,90 +218,32 @@ summary(lm_thours)
 
 ## Predicting league placement
 
-```{r pca}
+```{r randomForest}
 library(randomForest)
 
-# check a trained model on the complete set
-complete <- randomForest(LeagueIndex ~ ., data=sc, ntree = 10000)
-print(complete)
+# remove gameId
+data <- mutate(sc, GameID = NULL, TotalHoursLog = NULL)
+
+model <- randomForest(LeagueIndex ~ ., 
+                      data=data, 
+                      ntree = 10000)
+print(model)
 ```
-
-```{r classification, cache=T}
-# create a random sampling of the data for 10-fold cross validation
-# NOTE: we should do some label stratification here
-# NOTE: also, we have different number of samples per label!
-sc <- sc %>% mutate(cv_subset = sample(1:10, nrow(sc), T))
-
-result <- lapply(unique(sc$cv_subset), function(subset) {
-  # training set
-  train <- filter(sc, cv_subset != subset)
-  # test set
-  test <- filter(sc, cv_subset == subset)
-  
-  # build random forest
-  rf <- randomForest(LeagueIndex ~ ., data=train, 
-                     ntree=10000)
-  
-  # get and return predictions on test-test
-  prediction <- predict(rf, test)
-  mutate(test, predicted = prediction)
-})
-
-sc <- bind_rows(result)
-```
-
 
 ### Performance
-An interesting property of this problem now is that it is no standard classficiation
-problem with two classes, but rather one with 7 classes getting predicted.
-So to evaluate the performance we use the F1 score, but adopted
-to multi-class predictions (we are doing a weighted average of the F1 scores as
-calculated for the individual classes).
 
-```{r f1_def}
-f1 <- function(y, y_hat) {
-  # get a f1 measure for each label
-  # write it out explicetely
-  labels <- unique(y)
-  fp <- tp <- fn <- tn <- 0
-  temp <- lapply(labels, function(l) {
-    # false positives
-    fp <<- fp + sum(y_hat == l & y != l)
-    # true positives
-    tp <<- tp + sum(y_hat == l & y == l)
-    # false negatives
-    fn <<- fn + sum(y_hat != l & y == l)
-    # true negatives
-    tn <<- tn + sum(y_hat != l & y != l)
-  })
-  
-  # precision
-  prec <- tp / (tp + fp)
-  
-  # recall
-  rec <- tp / (tp + fn)
-  
-  # f1
-  f1 <-2 * (prec * rec)/(prec + rec)
+Wonderful! So we now fitted the random forest model, but as you can see we were not able to do a satisfying job here (out-of-bag error rate 58.75%).
 
-  # return  f1
-  f1
+```{r mock_league}
+mock_leagues <- factor(c(rep("bad",4), rep("good", 3)))
+names(mock_leagues) <- levels(sc$LeagueIndex)
 
-  return(f1)
-}
+sc_mock <- mutate(data, LeagueIndex = mock_leagues[LeagueIndex])
+model_mock <- randomForest(LeagueIndex ~ ., 
+                           data = sc_mock,
+                           ntree = 10000)
+print(model_mock)
 ```
-
-Now we calculated the weighted F1-score for our predictions:
-
-```{r f1}
-f1 <- f1(as.character(sc$LeagueIndex), 
-                  as.character(sc$predicted))
-f1
-
-```
-
-Wonderful! So we see that the performance isn't too bad if we take all the available features into account and with 10-fold cross validation.
-
 ### Feature importance
 
 
