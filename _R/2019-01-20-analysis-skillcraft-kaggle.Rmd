@@ -137,13 +137,6 @@ ggplot(sc_sub, aes(x=ActionLatency)) +
   facet_wrap(~LeagueIndex, ncol=3) + 
   ggtitle("ActionLatency by League")
 
-# TotalHours
-ggplot(sc_sub, aes(x=TotalHours)) + 
-  geom_histogram(stat="density") + 
-  facet_wrap(~LeagueIndex, ncol=3) + 
-  ggtitle("Hours per week by League")
-
-
 
 ```
 
@@ -164,9 +157,18 @@ sc_sub %>% group_by(LeagueIndex) %>% summarize(mean(ActionLatency))
 
 Indeed, the higher the league the lower the ActionLatency.
 
-Now let's check on the TotalHours - wow, something's wrong here! Seems that
-some few player have an extraordinary amount of played hours on their back,
-we should look at this in more detail!
+Now let's check on the TotalHours...
+```{r total_hours_overview}
+
+# TotalHours
+ggplot(sc_sub, aes(x=TotalHours)) + 
+  geom_histogram(stat="density") + 
+  facet_wrap(~LeagueIndex, ncol=3) + 
+  ggtitle("Hours per week by League")
+
+```
+
+Wow, something's wrong here! Seems that some few player have an extraordinary amount of played hours on their back, we should look at this in more detail!
 
 ## Total hours played 
 Since we can't really see anything in the plot, we check the table for some outliers.
@@ -180,10 +182,16 @@ kable(head(sc_sub %>% arrange(desc(TotalHours))))
 max_totalhours <- 10*365.25*24
 ```
 
-Crazy! There is one player (age 18!) who has apparently a total of 1,000,000 played hours.
+Crazy! There is one player (age 18!) who has apparently a total of 1,000,000 played hours...
 
 Let's do the math, shall we? So 1,000,000 hours, that would be 41,666 days and about 114 years. 
 Though I appreciate the effort, for the sake of our further analysis we should filter out unreasonable total hours in general.
+
+
+*Note*: There's a chance we interpreted the dataset wrong, since there is now real description afaik. 
+For now we just go with it.
+
+
 We remove all players with TotalHours > `r max_totalhours` (10 years).
 
 ```{r totalhours_filtered}

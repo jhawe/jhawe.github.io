@@ -4,7 +4,6 @@ date: "January 20, 2019"
 excerpt: "Exploratory analysis of the SkillCraft Kaggle dataset using tidyverse"
 tags: "skillcraft starcraft2 gaming esports"
 toc: true
-comments: true
 permalink: /skillcraft/
 ---
 
@@ -199,22 +198,6 @@ ggplot(sc_sub, aes(x=ActionLatency)) +
 
 <img src="/assets/figures/2019-01-20-analysis-skillcraft-kaggle/overview_plots-4.png" title="center" alt="center" style="display: block; margin: auto;" />
 
-{% highlight r %}
-# TotalHours
-ggplot(sc_sub, aes(x=TotalHours)) + 
-  geom_histogram(stat="density") + 
-  facet_wrap(~LeagueIndex, ncol=3) + 
-  ggtitle("Hours per week by League")
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## Warning: Ignoring unknown parameters: binwidth, bins, pad
-{% endhighlight %}
-
-<img src="/assets/figures/2019-01-20-analysis-skillcraft-kaggle/overview_plots-5.png" title="center" alt="center" style="display: block; margin: auto;" />
-
 Above we can see some interesting stuff already. First thinkg we notice is that 
 most players reside somewhere in the 'medium' leagues'. It seems that it is
 relatively easy to progress to Platinum/Diamond, however, in order to advance
@@ -248,9 +231,25 @@ sc_sub %>% group_by(LeagueIndex) %>% summarize(mean(ActionLatency))
 
 Indeed, the higher the league the lower the ActionLatency.
 
-Now let's check on the TotalHours - wow, something's wrong here! Seems that
-some few player have an extraordinary amount of played hours on their back,
-we should look at this in more detail!
+Now let's check on the TotalHours...
+
+{% highlight r %}
+# TotalHours
+ggplot(sc_sub, aes(x=TotalHours)) + 
+  geom_histogram(stat="density") + 
+  facet_wrap(~LeagueIndex, ncol=3) + 
+  ggtitle("Hours per week by League")
+{% endhighlight %}
+
+
+
+{% highlight text %}
+## Warning: Ignoring unknown parameters: binwidth, bins, pad
+{% endhighlight %}
+
+<img src="/assets/figures/2019-01-20-analysis-skillcraft-kaggle/total_hours_overview-1.png" title="center" alt="center" style="display: block; margin: auto;" />
+
+Wow, something's wrong here! Seems that some few player have an extraordinary amount of played hours on their back, we should look at this in more detail!
 
 ## Total hours played 
 Since we can't really see anything in the plot, we check the table for some outliers.
@@ -280,10 +279,16 @@ kable(head(sc_sub %>% arrange(desc(TotalHours))))
 max_totalhours <- 10*365.25*24
 {% endhighlight %}
 
-Crazy! There is one player (age 18!) who has apparently a total of 1,000,000 played hours.
+Crazy! There is one player (age 18!) who has apparently a total of 1,000,000 played hours...
 
 Let's do the math, shall we? So 1,000,000 hours, that would be 41,666 days and about 114 years. 
 Though I appreciate the effort, for the sake of our further analysis we should filter out unreasonable total hours in general.
+
+
+*Note*: There's a chance we interpreted the dataset wrong, since there is now real description afaik. 
+For now we just go with it.
+
+
 We remove all players with TotalHours > 8.766 &times; 10<sup>4</sup> (10 years).
 
 
@@ -598,13 +603,14 @@ print(model)
 ## Performance
 
 Wonderful! So we now fitted the random forest model, but what do we see here?
-Apparently we were not able to do a satisfying job here (out-of-bag error rate (OOB) around 64%!).
-That's disappointing. 
+Apparently we were not able to do a satisfying job (out-of-bag error rate (OOB) around 64%!).
+That's disappointing...
 
 ## Mock predictions
-Looking at the confusion matrix we seem to be fairly 'close'
-with most predictions. Since this is just for fun, let's define new 'mock' league,
-deviding the player into 'good' and 'bad' ones. Maybe we can do better on this
+Looking at the confusion matrix, however, we seem to be fairly 'close'
+with most predictions (if we assume that e.g. Silver league is similar to Bronze and Gold, etc.). 
+Since this analysis is just for fun, let's define new 'mock' leagues,
+deviding the player into 'good' and 'bad' ones. Maybe we can do better on these
 two classes case?
 
 
@@ -636,7 +642,7 @@ print(model_mock)
 ## good  366 1093   0.2508568
 {% endhighlight %}
 
-As we can see now, the OOB is a lot better at about 22%! Well, it's something!
+As we can see the OOB is a lot better at about 22%! It's something!
 
 ## Feature importance
 Finally, let's quickly check on the feature importance for the mock predictions.
@@ -655,12 +661,13 @@ model_mock$importance
 ## ActionLatency         620.7851
 {% endhighlight %}
 
-As we can see, the MeanDecreaseGini is highest for the ActionLatency, suggesting 
+The MeanDecreaseGini is highest for the ActionLatency, suggesting 
 that this variable is the most important one for predicting 'bad' and 'good' players
-in our mock prediction experiment. 
+in our mock prediction experiment (the higher the index in general, the 'more important' the
+respective variable). 
 
 # Conclusion
-We have looked at some of the more intuitive variables accessible in the SkillCraft
+We looked at some of the more intuitive variables accessible in the SkillCraft
 dataset and got a nice feel of the data using rather straight forward ggplot functionality.
 
 Overall, we were able to see that the league placement already gives a hint on the
