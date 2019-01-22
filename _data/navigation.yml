@@ -6,5 +6,7 @@ main:
     url: /skillcraft/
   - title: "Kaggle"
     url: /kaggle/
+  - title: "Music"
+    url: /music/
   - title: "About"
     url: /about/
