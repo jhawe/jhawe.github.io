@@ -125,28 +125,23 @@ ggplot(league_summary,
   ggtitle("Number of players per league")
 
 # age
-ggplot(sc_sub, aes(x=Age)) +
-  geom_histogram(stat = "density") +
-  facet_wrap(~LeagueIndex, ncol=3) +
+ggplot(sc_sub, aes(x=Age, col=LeagueIndex)) +
+  geom_freqpoly(stat = "density") +
   ggtitle("Age by League")
 
 # apm
-ggplot(sc_sub, aes(x=APM)) +
-  geom_histogram(stat="density") +
-  facet_wrap(~LeagueIndex, ncol=3) +
+ggplot(sc_sub, aes(x=APM, col=LeagueIndex)) +
+  geom_freqpoly(stat="density") +
   ggtitle("APM by League")
 
-
 # ActionLatency
-ggplot(sc_sub, aes(x=ActionLatency)) +
-  geom_histogram(stat="density") +
-  facet_wrap(~LeagueIndex, ncol=3) +
+ggplot(sc_sub, aes(x=ActionLatency, col=LeagueIndex)) +
+  geom_freqpoly(stat="density") +
   ggtitle("ActionLatency by League")
 
 # SelectByHotkeys
-ggplot(sc_sub, aes(x=SelectByHotkeys)) +
-  geom_histogram(stat="density") +
-  facet_wrap(~LeagueIndex, ncol=3) +
+ggplot(sc_sub, aes(x=SelectByHotkeys, col=LeagueIndex)) +
+  geom_freqpoly(stat="density") +
   ggtitle("SelectByHotkeys by League")
 
 
@@ -179,9 +174,8 @@ Now let's check on the TotalHours:
 ```{r total_hours_overview}
 
 # TotalHours
-ggplot(sc_sub, aes(x=TotalHours)) +
-  geom_histogram(stat="density") +
-  facet_wrap(~LeagueIndex, ncol=3) +
+ggplot(sc_sub, aes(x=TotalHours, col=LeagueIndex)) +
+  geom_freqpoly(stat="density") +
   ggtitle("Hours per week by League")
 
 ```
@@ -239,9 +233,8 @@ means:
 
 ```{r total_hours_fixed}
 # TotalHours
-ggplot(sc_sub, aes(x=TotalHoursLog)) +
-  geom_histogram(stat="density") +
-  facet_wrap(~LeagueIndex, ncol=3) +
+ggplot(sc_sub, aes(x=TotalHoursLog, col=LeagueIndex)) +
+  geom_freqpoly(stat="density") +
   ggtitle("Hours per week by League")
 
 group_by(sc_sub, LeagueIndex) %>%
