@@ -18,7 +18,7 @@ permalink: /skillcraft/
 
 
 Ah, this brings me back!
-
+ 
 To be honest, this dataset wasn't selected at random, but rather I stumbled upon it whilst browsing Kaggle.
 I've been enthusiastic about [StarCraft II](https://starcraft2.com/en-us/) and predecessor [StarCraft](https://starcraft.com/en-us/) for a long time, although recently I didn't play/watch any games due to a significant lack of time/setting higher priorities for it.
 So, naturally, when I saw the **SkillCraft** dataset from Kaggle ([link](https://www.kaggle.com/danofer/skillcraft)) I had to check it out :)
@@ -44,8 +44,9 @@ to be analyzed by us, so let's check it out!
 # Data exploration
 
 The datasets contains 20 columns and 3338 rows.
-Unfortunately the dataset does not have any more detailed description other
-than the column names (as far as I can see, that is):
+A detailed description of the dataset can be found on the [UCI ML repository](http://archive.ics.uci.edu/ml/datasets/SkillCraft1+Master+Table+Dataset).
+
+Print the column names:
 
 {% highlight text %}
 ##  [1] "GameID"               "LeagueIndex"          "Age"                 
@@ -58,7 +59,8 @@ than the column names (as far as I can see, that is):
 {% endhighlight %}
 
 ## Variable selection
-Alright. We got a GameID, LeagueIndex (there are 7 leagues, see below) and Age as some general player statistics
+Alright. We got a GameID, LeagueIndex (there are 7 leagues, see below, in contrast to the
+8 leagues indicated in the description) and Age as some general player statistics
 (in the rest of the analysis I'll assume that 'GameID' is actually 'GamerID',
 and that the collected stats are summaries over the gamer's game history).
 
@@ -385,20 +387,20 @@ later point.
 ##         OOB estimate of  error rate: 63.92%
 ## Confusion matrix:
 ##             Bronze Silver Gold Platinum Diamond Master GrandMaster
-## Bronze          52     58   32       23       1      1           0
-## Silver          49     86   97       94      17      4           0
-## Gold            30     80  145      197      82     19           0
-## Platinum        10     55  162      294     216     73           1
-## Diamond          0     10   68      211     310    202           2
-## Master           0      0   10       71     221    315           4
-## GrandMaster      0      0    0        1       5     27           2
+## Bronze          51     61   31       21       2      1           0
+## Silver          49     86   98       93      17      4           0
+## Gold            29     83  144      195      81     21           0
+## Platinum        10     57  162      289     217     75           1
+## Diamond          0     11   66      209     309    206           2
+## Master           0      0   10       68     216    323           4
+## GrandMaster      0      0    0        1       4     28           2
 ##             class.error
-## Bronze        0.6886228
+## Bronze        0.6946108
 ## Silver        0.7521614
-## Gold          0.7377939
-## Platinum      0.6374846
-## Diamond       0.6139477
-## Master        0.4927536
+## Gold          0.7396022
+## Platinum      0.6436498
+## Diamond       0.6151930
+## Master        0.4798712
 ## GrandMaster   0.9428571
 {% endhighlight %}
 
@@ -425,11 +427,11 @@ two classes?
 ##                      Number of trees: 10000
 ## No. of variables tried at each split: 2
 ## 
-##         OOB estimate of  error rate: 21.13%
+##         OOB estimate of  error rate: 20.95%
 ## Confusion matrix:
 ##       bad good class.error
-## bad  1536  342   0.1821086
-## good  363 1096   0.2488005
+## bad  1537  341   0.1815761
+## good  358 1101   0.2453735
 {% endhighlight %}
 
 As we can see the OOB is a lot better at about 22%, it's something!
@@ -440,10 +442,10 @@ Finally, let's quickly check on the feature importance for the mock predictions.
 
 {% highlight text %}
 ##                 MeanDecreaseGini
-## TotalHours              240.7170
-## APM                     469.8440
-## ActionLatency           580.6031
-## SelectByHotkeys         350.5135
+## TotalHours              240.6842
+## APM                     469.1021
+## ActionLatency           579.2478
+## SelectByHotkeys         352.5998
 {% endhighlight %}
 
 The MeanDecreaseGini is highest for the ActionLatency, suggesting
@@ -498,25 +500,28 @@ Until then, farewell!
 ## [1] stats     graphics  grDevices utils     datasets  base     
 ## 
 ## other attached packages:
-##  [1] bindrcpp_0.2.2  reshape2_1.4.3  forcats_0.3.0   stringr_1.3.1  
-##  [5] dplyr_0.7.8     purrr_0.2.5     readr_1.3.1     tidyr_0.8.2    
-##  [9] tibble_2.0.1    ggplot2_3.1.0   tidyverse_1.2.1 knitr_1.21     
+##  [1] randomForest_4.6-14 bindrcpp_0.2.2      reshape2_1.4.3     
+##  [4] forcats_0.3.0       stringr_1.3.1       dplyr_0.7.8        
+##  [7] purrr_0.2.5         readr_1.3.1         tidyr_0.8.2        
+## [10] tibble_2.0.1        ggplot2_3.1.0       tidyverse_1.2.1    
+## [13] knitr_1.21         
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] Rcpp_1.0.0        highr_0.7         cellranger_1.1.0 
-##  [4] pillar_1.3.1      compiler_3.4.4    plyr_1.8.4       
-##  [7] bindr_0.1.1       methods_3.4.4     tools_3.4.4      
-## [10] digest_0.6.18     viridisLite_0.3.0 lubridate_1.7.4  
-## [13] jsonlite_1.6      evaluate_0.12     nlme_3.1-131     
-## [16] gtable_0.2.0      lattice_0.20-35   pkgconfig_2.0.2  
-## [19] rlang_0.3.1       cli_1.0.1         rstudioapi_0.9.0 
-## [22] haven_2.0.0       xfun_0.4          withr_2.1.2      
-## [25] xml2_1.2.0        httr_1.4.0        hms_0.4.2        
-## [28] generics_0.0.2    grid_3.4.4        tidyselect_0.2.5 
-## [31] glue_1.3.0        R6_2.3.0          fansi_0.4.0      
-## [34] readxl_1.2.0      modelr_0.1.2      magrittr_1.5     
-## [37] backports_1.1.3   scales_1.0.0      rvest_0.3.2      
-## [40] assertthat_0.2.0  colorspace_1.4-0  labeling_0.3     
-## [43] utf8_1.1.4        stringi_1.2.4     lazyeval_0.2.1   
-## [46] munsell_0.5.0     broom_0.5.1       crayon_1.3.4
+##  [1] tidyselect_0.2.5  xfun_0.4          haven_2.0.0      
+##  [4] lattice_0.20-35   colorspace_1.4-0  generics_0.0.2   
+##  [7] viridisLite_0.3.0 utf8_1.1.4        rlang_0.3.1      
+## [10] pillar_1.3.1      glue_1.3.0        withr_2.1.2      
+## [13] modelr_0.1.2      readxl_1.2.0      bindr_0.1.1      
+## [16] plyr_1.8.4        munsell_0.5.0     gtable_0.2.0     
+## [19] cellranger_1.1.0  rvest_0.3.2       codetools_0.2-15 
+## [22] evaluate_0.12     labeling_0.3      fansi_0.4.0      
+## [25] highr_0.7         broom_0.5.1       methods_3.4.4    
+## [28] Rcpp_1.0.0        scales_1.0.0      backports_1.1.3  
+## [31] jsonlite_1.6      hms_0.4.2         digest_0.6.18    
+## [34] stringi_1.2.4     grid_3.4.4        cli_1.0.1        
+## [37] tools_3.4.4       magrittr_1.5      lazyeval_0.2.1   
+## [40] crayon_1.3.4      pkgconfig_2.0.2   xml2_1.2.0       
+## [43] lubridate_1.7.4   assertthat_0.2.0  httr_1.4.0       
+## [46] rstudioapi_0.9.0  R6_2.3.0          nlme_3.1-131     
+## [49] compiler_3.4.4
 {% endhighlight %}

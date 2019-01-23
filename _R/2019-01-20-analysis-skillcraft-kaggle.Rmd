@@ -8,7 +8,7 @@ permalink: /skillcraft/
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, fig.align="center", message = FALSE, warning=FALSE)
+knitr::opts_chunk$set(echo = FALSE, fig.align="center", message = FALSE, warning=FALSE, fig_width=10)
 library(tidyverse)
 library(ggplot2)
 library(reshape2)
@@ -24,7 +24,7 @@ library(knitr)
 
 
 Ah, this brings me back!
-
+ 
 To be honest, this dataset wasn't selected at random, but rather I stumbled upon it whilst browsing Kaggle.
 I've been enthusiastic about [StarCraft II](https://starcraft2.com/en-us/) and predecessor [StarCraft](https://starcraft.com/en-us/) for a long time, although recently I didn't play/watch any games due to a significant lack of time/setting higher priorities for it.
 So, naturally, when I saw the **SkillCraft** dataset from Kaggle ([link](https://www.kaggle.com/danofer/skillcraft)) I had to check it out :)
@@ -52,14 +52,16 @@ to be analyzed by us, so let's check it out!
 sc <- read_csv("../datasets/SkillCraft.csv")
 ```
 The datasets contains `r ncol(sc)` columns and `r nrow(sc)` rows.
-Unfortunately the dataset does not have any more detailed description other
-than the column names (as far as I can see, that is):
+A detailed description of the dataset can be found on the [UCI ML repository](http://archive.ics.uci.edu/ml/datasets/SkillCraft1+Master+Table+Dataset).
+
+Print the column names:
 ```{r columns}
 colnames(sc)
 ```
 
 ## Variable selection
-Alright. We got a GameID, LeagueIndex (there are 7 leagues, see below) and Age as some general player statistics
+Alright. We got a GameID, LeagueIndex (there are 7 leagues, see below, in contrast to the
+8 leagues indicated in the description) and Age as some general player statistics
 (in the rest of the analysis I'll assume that 'GameID' is actually 'GamerID',
 and that the collected stats are summaries over the gamer's game history).
 
