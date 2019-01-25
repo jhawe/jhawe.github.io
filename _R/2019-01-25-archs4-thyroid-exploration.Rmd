@@ -1,0 +1,202 @@
+---
+title: "Analysis of a thyroid gene expression dataset"
+date: "January 20, 2019"
+excerpt: "Exploratory analysis of a raw and normalized human thyroid gene expression dataset obtained from ARCHS4"
+tags: "thyroid gene expression archs4 tsne"
+toc: true
+permalink: /archs4-thyroid-analysis/
+---
+
+```{r libraries}
+# set options and load libraries
+knitr::opts_chunk$set(echo = FALSE, fig.align="center", 
+  message = FALSE, warning=FALSE, fig_width=10)
+
+library(tidyverse)
+library(ggplot2)
+library(reshape2)
+library(knitr)
+library(pheatmap)
+library(Rtsne)
+
+# read the expression data (raw and normalized
+expr <- read_tsv(snakemake@input$expr) %>%
+  rename(gene_name = X1)
+raw <- read_tsv(snakemake@input$raw) %>%
+  rename(gene_name = X1)
+
+# load design and do some cleaning
+# NOTE: we only download the H. sapiens file
+design <- read_tsv(snakemake@input$design) %>%
+  mutate(tissue = trimws(tolower(gsub("Homo sapiens |Human","",tissue))))
+
+# sanity check for sample ordering
+print("Order of samples in expr and design is the same:")
+all(colnames(expr %>% mutate(gene_name = NULL)) == design$sample)
+
+```
+# Inroduction
+
+This is an exploratory analysis of the downloaded and processed ARCHS<sup>4</sup> 
+gene expression data for a [thyroid](https://en.wikipedia.org/wiki/Thyroid) 
+tissue specification. 
+Data was obtained from ARCHS<sup>4</sup> using the non-official [ARCHS4 data loader](https://github.com/jhawe/archs4_loader)
+
+## Gene expression data
+The [central dogma of biology](https://en.wikipedia.org/wiki/Central_dogma_of_molecular_biology) 
+states that genes on the DNA of a cell are transcribed into RNAs which are in turn further processed 
+and translated into proteins.
+Modern experimental technologies such as [next-generation sequencing](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3841808/)
+enable researchers to obtain a complete read-out of RNA molecules present in a specific 
+biosample at the time of measurement. 
+These read-outs can be quantified on a per gene (or per transcript) basis to obtain gene expression
+data: A quantitative estimate of the amount of RNA molecules per gene present in individual biosamples.
+Using these estimates, scientist seek to answer pressing biomedical questions such as 
+to uncover the molecular mechanisms behind cancer or other diseases.
+
+## ARCHS<sup>4<sup>
+ARCHS<sup>4</sup> is a project which seeks to unite gene expression data form diverse sources
+and provide easy access to a homogenously processed data matrix, containing hundreds of
+individual samples, now ready to be jointly analyzed.
+In this short analysis we'll have a look on ARCHS<sup>4</sup> Thyroid gene expression data
+where we want to get an idea of how uniform these data are and whether additional
+(manual) curation is necessary prior to downstream analysis.
+
+## t-SNE
+For our analysis we use the t-SNE algorithm.
+TODO
+
+# Data
+In this analysis we will have have a look at the raw gene counts as well as the
+normalized expression matrix as provided by the ARCHS<sup>4</sup> loader.
+
+After loading the data, we see that we have a total of `r nrow(expr)` genes 
+measured in `r ncol(expr)-1` samples (common for both raw and normalized data).
+Below is a sample of the raw data matrix:
+
+```{r load_data}
+
+print("Expression:")
+kable(expr[1:5,1:10])
+
+```
+
+In addition to the expression data, we the ARCHS<sup>4</sup> loader provides us with
+a design table containing the following column names:
+
+```{r design_cols}
+colnames(design)
+```
+
+Before looking in detail at the expression data, we first have a look at the individual columns
+of the design table in order to better get to know our data.
+Below we show for each column of the design matrix the unique values contained
+therein. This is a bit messy, but for now we accept this:
+
+```{r values_by_cols}
+lapply(colnames(design), function(x) {
+  design %>% select(one_of(x)) %>% unique
+})
+```
+
+Let's also check how many samples we get if we group by the individual values 
+for each of the columns:
+
+```{r samples_by_groups}
+# we remove id, series and description
+cols <- colnames(design)[-c(1,3,5)]
+
+lapply(cols, function(x) {
+  design %>% group_by_(.dots = as.symbol(x)) %>% 
+    summarize(count=n()) %>% 
+    arrange(desc(count))
+})
+
+```
+
+TODO
+describe what we sse
+
+# Raw and batch normalized gene expression
+
+Ok, now let's have a look at the actual gene expression data.
+We will have a look at the histogram of all expression values and a heatmap
+of the top 1% most variable genes. We will do this both for the normalized
+data as well as the raw gene expression counts:
+
+```{r expression_overview}
+expr_subs <- expr
+expr_subs$gene_name <- NULL
+expr$gene_var <- apply(expr_subs,1,var)
+expr_subs <- filter(expr, gene_var > quantile(gene_var, .99))
+
+raw_subs <- raw
+raw_subs$gene_name <- NULL
+raw$gene_var <- apply(raw_subs,1,var)
+raw_subs <- filter(raw, gene_var > quantile(gene_var, .99))
+
+# histogram
+toplot <- expr %>% mutate(gene_var = NULL, gene_name = NULL) %>%
+  melt
+ggplot(toplot, aes(x=value)) + geom_histogram() + xlab("expression") + 
+  ggtitle("Distribution of expression values.")
+
+# heatmap raw
+raw_corr <- mutate(raw_subs, gene_var = NULL, gene_name = NULL) %>% t %>% cor
+pheatmap(raw_corr, main = "Correlation map of top 1% variable genes (raw).")
+
+# heatmap norm
+expr_corr <- mutate(expr_subs, gene_var = NULL, gene_name = NULL) %>% t %>% cor
+pheatmap(expr_corr, main = "Correlation map of top 1% variable genes (norm).")
+
+```
+
+TODO describe what we see
+# t-SNE
+Now let's do some tSNE plots to see whether we can see any specific clusters emerging.
+Specifically, we will look at two types of t-SNE plots: One for the raw expression data as 
+was extracted from ARCHS4 and one using the batch normalized data.
+
+```{r tsne}
+
+expr_subs <- t(mutate(expr, gene_var = NULL, gene_name = NULL))
+raw_subs <- t(mutate(raw, gene_var = NULL, gene_name = NULL))
+
+# tsne
+reduction <- Rtsne(expr_subs, max_iter = 1000, theta = 0.0, 
+                   dims = 2, perplexity = 30)
+reduction_raw <- Rtsne(raw_subs, max_iter = 1000, theta = 0.0, 
+                   dims = 2, perplexity = 30)
+
+# plotting
+toplot <- data.frame(rbind(reduction$Y, reduction_raw$Y))
+colnames(toplot) <- c("dim1", "dim2")
+
+toplot <- mutate(toplot, type = c(rep("normalized", nrow(reduction$Y)),
+                                  rep("raw", nrow(reduction_raw$Y))))
+
+toplot <- cbind(toplot, tissue = design$tissue, instrument = design$instrument,
+                series=design$series)
+
+ggplot(toplot, aes(x=dim1, y=dim2, col=tissue)) + 
+  geom_point() + 
+  facet_wrap(~type, nrow=2) +
+  ggtitle("t-SNE on gene expression data labeled \nby 'tissue' meta-data information")
+
+ggplot(toplot, aes(x=dim1, y=dim2, col=instrument)) + 
+  geom_point() + 
+  facet_wrap(~type, nrow=2) +
+  ggtitle("t-SNE on gene expression data labeled \nby 'instrument' meta-data information")
+
+ggplot(toplot, aes(x=dim1, y=dim2, col=series)) + 
+  geom_point() + 
+  facet_wrap(~type, nrow=2) +
+  ggtitle("t-SNE on gene expression data labeled \nby 'Series' meta-data information")
+
+```
+
+TODO describe what we see
+## Session Info
+```{r}
+sessionInfo()
+```
