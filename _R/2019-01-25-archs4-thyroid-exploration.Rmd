@@ -7,7 +7,7 @@ toc: true
 permalink: /archs4-thyroid-analysis/
 ---
 
-```{r libraries}
+```{r libraries, include=FALSE}
 # set options and load libraries
 knitr::opts_chunk$set(echo = FALSE, fig.align="center", 
   message = FALSE, warning=FALSE, fig_width=10)
@@ -29,10 +29,6 @@ raw <- read_tsv("../../archs4_results/Thyroid/expression_raw.tsv") %>%
 # NOTE: we only download the H. sapiens file
 design <- read_tsv("../../archs4_results/Thyroid/design.tsv") %>%
   mutate(tissue = trimws(tolower(gsub("Homo sapiens |Human","",tissue))))
-
-# sanity check for sample ordering
-print("Order of samples in expr and design is the same:")
-all(colnames(expr %>% mutate(gene_name = NULL)) == design$sample)
 
 ```
 # Inroduction
@@ -66,7 +62,7 @@ where we want to get an idea of how uniform these data are and whether additiona
 For our look on the data we use the t-SNE algorithm.
 TODO
 
-# Data
+# Exploration
 In this analysis we will have have a look at the raw gene counts as well as the
 normalized expression matrix as provided by the ARCHS<sup>4</sup> loader.
 
@@ -76,7 +72,6 @@ Below is a sample of the raw data matrix:
 
 ```{r load_data}
 
-print("Expression:")
 kable(expr[1:5,1:10])
 
 ```
@@ -111,7 +106,7 @@ design %>% group_by(tissue) %>%
 As we can see there is some diversity in this column. We can also see, however, that we can probably combine some of these annotations since they seem very similar (look e.g. at the 'thyroid tissue' and 'thyroid' annotation).
 If we'd want to extract a dataset as homogenuous as possible from these data we could consider doing this, but for now we stick with what we have.
 
-# Raw and batch normalized gene expression
+## Raw and batch normalized gene expression
 
 Ok, now let's have a look at the actual gene expression data.
 We will have a look at the histogram of all expression values and a heatmap
@@ -148,7 +143,7 @@ correlation_map(expr_corr, cluster=T, dilution = 100, main = "Correlation map of
 
 TODO describe what we see
 
-# t-SNE
+## t-SNE
 Now let's do some tSNE plots to see whether we can see any specific clusters emerging.
 Specifically, we will look at two types of t-SNE plots: One for the raw expression data as 
 was extracted from ARCHS4 and one using the batch normalized data.
@@ -189,7 +184,7 @@ ggplot(toplot, aes(x=dim1, y=dim2, col=instrument)) +
 
 TODO describe what we see
 
-## Session Info
+# Session Info
 ```{r}
 sessionInfo()
 ```

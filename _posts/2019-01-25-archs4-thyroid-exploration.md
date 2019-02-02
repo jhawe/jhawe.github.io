@@ -8,166 +8,6 @@ permalink: /archs4-thyroid-analysis/
 ---
 
 
-{% highlight r %}
-# set options and load libraries
-knitr::opts_chunk$set(echo = FALSE, fig.align="center", 
-  message = FALSE, warning=FALSE, fig_width=10)
-
-library(tidyverse)
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## ── Attaching packages ────────────────────────────────── tidyverse 1.2.1 ──
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## ✔ ggplot2 3.1.0     ✔ purrr   0.3.0
-## ✔ tibble  2.0.1     ✔ dplyr   0.7.8
-## ✔ tidyr   0.8.2     ✔ stringr 1.3.1
-## ✔ readr   1.3.1     ✔ forcats 0.3.0
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## ── Conflicts ───────────────────────────────────── tidyverse_conflicts() ──
-## ✖ dplyr::filter() masks stats::filter()
-## ✖ dplyr::lag()    masks stats::lag()
-{% endhighlight %}
-
-
-
-{% highlight r %}
-library(reshape2)
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## 
-## Attaching package: 'reshape2'
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## The following object is masked from 'package:tidyr':
-## 
-##     smiths
-{% endhighlight %}
-
-
-
-{% highlight r %}
-library(knitr)
-library(pheatmap)
-library(Rtsne)
-source("../_scripts/plotting.R")
-
-# read the expression data (raw and normalized
-expr <- read_tsv("../../archs4_results/Thyroid/expression_normalized.tsv") %>%
-  rename(gene_name = X1)
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## Warning: Missing column names filled in: 'X1' [1]
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## Parsed with column specification:
-## cols(
-##   .default = col_double(),
-##   X1 = col_character()
-## )
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## See spec(...) for full column specifications.
-{% endhighlight %}
-
-
-
-{% highlight r %}
-raw <- read_tsv("../../archs4_results/Thyroid/expression_raw.tsv") %>%
-  rename(gene_name = X1)
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## Warning: Missing column names filled in: 'X1' [1]
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## Parsed with column specification:
-## cols(
-##   .default = col_double(),
-##   X1 = col_character()
-## )
-## See spec(...) for full column specifications.
-{% endhighlight %}
-
-
-
-{% highlight r %}
-# load design and do some cleaning
-# NOTE: we only download the H. sapiens file
-design <- read_tsv("../../archs4_results/Thyroid/design.tsv") %>%
-  mutate(tissue = trimws(tolower(gsub("Homo sapiens |Human","",tissue))))
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## Parsed with column specification:
-## cols(
-##   sample = col_character(),
-##   tissue = col_character(),
-##   series = col_character(),
-##   organism = col_character(),
-##   molecule = col_character(),
-##   characteristics = col_character(),
-##   description = col_character(),
-##   instrument = col_character()
-## )
-{% endhighlight %}
-
-
-
-{% highlight r %}
-# sanity check for sample ordering
-print("Order of samples in expr and design is the same:")
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## [1] "Order of samples in expr and design is the same:"
-{% endhighlight %}
-
-
-
-{% highlight r %}
-all(colnames(expr %>% mutate(gene_name = NULL)) == design$sample)
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## [1] TRUE
-{% endhighlight %}
 # Inroduction
 
 This is an exploratory analysis of the downloaded and processed ARCHS<sup>4</sup> 
@@ -199,19 +39,13 @@ where we want to get an idea of how uniform these data are and whether additiona
 For our look on the data we use the t-SNE algorithm.
 TODO
 
-# Data
+# Exploration
 In this analysis we will have have a look at the raw gene counts as well as the
 normalized expression matrix as provided by the ARCHS<sup>4</sup> loader.
 
 After loading the data, we see that we have a total of 35238 genes 
 measured in 143 samples (common for both raw and normalized data).
 Below is a sample of the raw data matrix:
-
-
-{% highlight text %}
-## [1] "Expression:"
-{% endhighlight %}
-
 
 
 |gene_name | GSM742951| GSM913883| GSM913881| GSM1185644| GSM913884| GSM1185638| GSM913876| GSM913888| GSM1185640|
@@ -334,7 +168,7 @@ Let's also check how many samples we get if we group by the individual 'tissues'
 As we can see there is some diversity in this column. We can also see, however, that we can probably combine some of these annotations since they seem very similar (look e.g. at the 'thyroid tissue' and 'thyroid' annotation).
 If we'd want to extract a dataset as homogenuous as possible from these data we could consider doing this, but for now we stick with what we have.
 
-# Raw and batch normalized gene expression
+## Raw and batch normalized gene expression
 
 Ok, now let's have a look at the actual gene expression data.
 We will have a look at the histogram of all expression values and a heatmap
@@ -345,7 +179,7 @@ data as well as the raw gene expression counts for comparison:
 
 TODO describe what we see
 
-# t-SNE
+## t-SNE
 Now let's do some tSNE plots to see whether we can see any specific clusters emerging.
 Specifically, we will look at two types of t-SNE plots: One for the raw expression data as 
 was extracted from ARCHS4 and one using the batch normalized data.
@@ -354,7 +188,7 @@ was extracted from ARCHS4 and one using the batch normalized data.
 
 TODO describe what we see
 
-## Session Info
+# Session Info
 
 {% highlight text %}
 ## R version 3.4.4 (2018-03-15)
