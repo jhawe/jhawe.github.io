@@ -13,21 +13,21 @@ knitr::opts_chunk$set(echo = FALSE, fig.align="center",
   message = FALSE, warning=FALSE, fig_width=10)
 
 library(tidyverse)
-library(ggplot2)
 library(reshape2)
 library(knitr)
 library(pheatmap)
 library(Rtsne)
+source("../_scripts/plotting.R")
 
 # read the expression data (raw and normalized
-expr <- read_tsv(snakemake@input$expr) %>%
+expr <- read_tsv("../../archs4_results/Thyroid/expression_normalized.tsv") %>%
   rename(gene_name = X1)
-raw <- read_tsv(snakemake@input$raw) %>%
+raw <- read_tsv("../../archs4_results/Thyroid/expression_raw.tsv") %>%
   rename(gene_name = X1)
 
 # load design and do some cleaning
 # NOTE: we only download the H. sapiens file
-design <- read_tsv(snakemake@input$design) %>%
+design <- read_tsv("../../archs4_results/Thyroid/design.tsv") %>%
   mutate(tissue = trimws(tolower(gsub("Homo sapiens |Human","",tissue))))
 
 # sanity check for sample ordering
@@ -63,7 +63,7 @@ where we want to get an idea of how uniform these data are and whether additiona
 (manual) curation is necessary prior to downstream analysis.
 
 ## t-SNE
-For our analysis we use the t-SNE algorithm.
+For our look on the data we use the t-SNE algorithm.
 TODO
 
 # Data
@@ -81,8 +81,8 @@ kable(expr[1:5,1:10])
 
 ```
 
-In addition to the expression data, we the ARCHS<sup>4</sup> loader provides us with
-a design table containing the following column names:
+In addition to the expression data, the ARCHS<sup>4</sup> loader provides us with
+a design table containing the following column names(already somewhat adjusted for better readability):
 
 ```{r design_cols}
 colnames(design)
@@ -94,35 +94,29 @@ Below we show for each column of the design matrix the unique values contained
 therein. This is a bit messy, but for now we accept this:
 
 ```{r values_by_cols}
-lapply(colnames(design), function(x) {
+lapply(colnames(select(design, -sample, -series, -organism)), function(x) {
   design %>% select(one_of(x)) %>% unique
 })
 ```
 
-Let's also check how many samples we get if we group by the individual values 
-for each of the columns:
+Let's also check how many samples we get if we group by the individual 'tissues':
 
 ```{r samples_by_groups}
-# we remove id, series and description
-cols <- colnames(design)[-c(1,3,5)]
-
-lapply(cols, function(x) {
-  design %>% group_by_(.dots = as.symbol(x)) %>% 
-    summarize(count=n()) %>% 
-    arrange(desc(count))
-})
+design %>% group_by(tissue) %>% 
+  summarize(count=n()) %>% 
+  arrange(desc(count))
 
 ```
 
-TODO
-describe what we sse
+As we can see there is some diversity in this column. We can also see, however, that we can probably combine some of these annotations since they seem very similar (look e.g. at the 'thyroid tissue' and 'thyroid' annotation).
+If we'd want to extract a dataset as homogenuous as possible from these data we could consider doing this, but for now we stick with what we have.
 
 # Raw and batch normalized gene expression
 
 Ok, now let's have a look at the actual gene expression data.
 We will have a look at the histogram of all expression values and a heatmap
 of the top 1% most variable genes. We will do this both for the normalized
-data as well as the raw gene expression counts:
+data as well as the raw gene expression counts for comparison:
 
 ```{r expression_overview}
 expr_subs <- expr
@@ -136,22 +130,24 @@ raw$gene_var <- apply(raw_subs,1,var)
 raw_subs <- filter(raw, gene_var > quantile(gene_var, .99))
 
 # histogram
-toplot <- expr %>% mutate(gene_var = NULL, gene_name = NULL) %>%
+toplot <- expr %>% 
+  mutate(gene_var = NULL, gene_name = NULL) %>%
   melt
 ggplot(toplot, aes(x=value)) + geom_histogram() + xlab("expression") + 
   ggtitle("Distribution of expression values.")
 
 # heatmap raw
 raw_corr <- mutate(raw_subs, gene_var = NULL, gene_name = NULL) %>% t %>% cor
-pheatmap(raw_corr, main = "Correlation map of top 1% variable genes (raw).")
+correlation_map(raw_corr, cluster=T, dilution = 100, main = "Correlation map of top 1% variable genes (raw).")
 
 # heatmap norm
 expr_corr <- mutate(expr_subs, gene_var = NULL, gene_name = NULL) %>% t %>% cor
-pheatmap(expr_corr, main = "Correlation map of top 1% variable genes (norm).")
+correlation_map(expr_corr, cluster=T, dilution = 100, main = "Correlation map of top 1% variable genes (norm).")
 
 ```
 
 TODO describe what we see
+
 # t-SNE
 Now let's do some tSNE plots to see whether we can see any specific clusters emerging.
 Specifically, we will look at two types of t-SNE plots: One for the raw expression data as 
@@ -164,9 +160,9 @@ raw_subs <- t(mutate(raw, gene_var = NULL, gene_name = NULL))
 
 # tsne
 reduction <- Rtsne(expr_subs, max_iter = 1000, theta = 0.0, 
-                   dims = 2, perplexity = 30)
+                   dims = 2, perplexity = 30, threads=2)
 reduction_raw <- Rtsne(raw_subs, max_iter = 1000, theta = 0.0, 
-                   dims = 2, perplexity = 30)
+                   dims = 2, perplexity = 30, threads=2)
 
 # plotting
 toplot <- data.frame(rbind(reduction$Y, reduction_raw$Y))
@@ -188,14 +184,11 @@ ggplot(toplot, aes(x=dim1, y=dim2, col=instrument)) +
   facet_wrap(~type, nrow=2) +
   ggtitle("t-SNE on gene expression data labeled \nby 'instrument' meta-data information")
 
-ggplot(toplot, aes(x=dim1, y=dim2, col=series)) + 
-  geom_point() + 
-  facet_wrap(~type, nrow=2) +
-  ggtitle("t-SNE on gene expression data labeled \nby 'Series' meta-data information")
 
 ```
 
 TODO describe what we see
+
 ## Session Info
 ```{r}
 sessionInfo()
