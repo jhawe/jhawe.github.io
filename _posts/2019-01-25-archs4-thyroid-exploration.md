@@ -4,6 +4,7 @@ date: "January 20, 2019"
 excerpt: "Exploratory analysis of a raw and normalized human thyroid gene expression dataset obtained from ARCHS4"
 tags: "thyroid gene expression archs4 tsne"
 toc: true
+publish: false
 permalink: /archs4-thyroid-analysis/
 ---
 
