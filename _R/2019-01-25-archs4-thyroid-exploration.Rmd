@@ -17,6 +17,10 @@ library(reshape2)
 library(knitr)
 library(pheatmap)
 library(Rtsne)
+
+# set default theme
+theme_set(theme_bw())
+
 source("../_scripts/plotting.R")
 
 # read the expression data (raw and normalized
@@ -35,8 +39,10 @@ design <- read_tsv("../../archs4_results/Thyroid/design.tsv") %>%
 
 This is an exploratory analysis of the downloaded and processed ARCHS<sup>4</sup> 
 gene expression data for a [thyroid](https://en.wikipedia.org/wiki/Thyroid) 
-tissue specification. 
-Data was obtained from ARCHS<sup>4</sup> using the non-official [ARCHS4 data loader](https://github.com/jhawe/archs4_loader)
+tissue specification. Here we want to get an idea of how uniform these data are and whether additional
+(manual) curation would be necessary prior to any downstream analysis.
+
+> NOTE: All data were obtained from ARCHS<sup>4</sup> using the [ARCHS4 data loader](https://github.com/jhawe/archs4_loader) (under development)
 
 ## Gene expression data
 The [central dogma of biology](https://en.wikipedia.org/wiki/Central_dogma_of_molecular_biology) 
@@ -46,35 +52,78 @@ Modern experimental technologies such as [next-generation sequencing](https://ww
 enable researchers to obtain a complete read-out of RNA molecules present in a specific 
 biosample at the time of measurement. 
 These read-outs can be quantified on a per gene (or per transcript) basis to obtain gene expression
-data: A quantitative estimate of the amount of RNA molecules per gene present in individual biosamples.
-Using these estimates, scientist seek to answer pressing biomedical questions such as 
-to uncover the molecular mechanisms behind cancer or other diseases.
+data: A quantitative recording of the amount of RNA molecules per gene present in individual biosamples (ofter a mixture of cells of a specific tissue, such as the thyroid in our case).
+Using these estimates, scientist seek to answer pressing biomedical questions such as the identification of the molecular mechanisms behind cancer or other diseases.
 
 ## ARCHS<sup>4<sup>
-ARCHS<sup>4</sup> is a project which seeks to unite gene expression data form diverse sources
-and provide easy access to a homogenously processed data matrix, containing hundreds of
-individual samples, now ready to be jointly analyzed.
-In this short analysis we'll have a look on ARCHS<sup>4</sup> Thyroid gene expression data
-where we want to get an idea of how uniform these data are and whether additional
-(manual) curation is necessary prior to downstream analysis.
+Typically, a gene expression dataset is comprised of relatively few samples (ten to several hundred) as compared to the number of quantified genes (tens of thousands) making statistical analysis challenging.
+Gene expression data can be gathered using diverse experimental protocols and hence data obtained from different laboratories can usually not be analyzed 'as is' in any meta study seeking to harvest a larger sample size which is often limited for individual studies.
+ARCHS<sup>4</sup> is a project which seeks to unite gene expression data form diverse laboratories and provide easy access to a homogeneously processed data matrix, containing hundreds to thousands of individual samples ready for a joint analysis. This increased sample size could potentially yield a higher statistical power to discover e.g. functional molecular pathways.
+
+> NOTE: A detailed overview on ARCHS<sup>4</sup> can be found on the [ARCHS<sup>4</sup> homepage](https://amp.pharm.mssm.edu/archs4/) or in the respective [publication](https://www.nature.com/articles/s41467-018-03751-6).
 
 ## t-SNE
-For our look on the data we use the t-SNE algorithm.
-TODO
+To visualize and get an impression of our gene expression data we utilize the [t-SNE algorithm](https://lvdmaaten.github.io/tsne/).
+Briefly, t-SNE is a dimension reduction technique (think of e.g. PCA or your other favourite dimension reduction method) which enables us
+to obtain a low dimensional (say, 2-3 dimensions) representation of a high dimensional (e.g. several thousands, as with gene expression data).
+We can use this low dimensional representation to nicely display our data on a simple 2-dimensional space, such as a regular x-y plot. In this representation, very similar samples will be close to each other and hence form clusters. These we can then interpret by e.g. coloring the individual points with specific sample annotations.
+
+Let's start!
 
 # Exploration
 In this analysis we will have have a look at the raw gene counts as well as the
-normalized expression matrix as provided by the ARCHS<sup>4</sup> loader.
+normalized expression matrix as provided by the ARCHS<sup>4</sup> loader. 
+
+> NOTE: I will not go into more details regarding 'gene counts' or 'normalization'. Both are quantitative values of the amount of RNA present in a cell per specific gene, the former being the 'direct readouts' from the sequencing machine (after some initial processing) and the latter is adjusted for sources of unwanted variation which could have influenced our readouts, such as different length of genes, differences in sample preparation during the experiment etc.
 
 After loading the data, we see that we have a total of `r nrow(expr)` genes 
-measured in `r ncol(expr)-1` samples (common for both raw and normalized data).
+measured in `r ncol(expr)-1` samples (same for both raw and normalized data).
 Below is a sample of the raw data matrix:
 
 ```{r load_data}
 
-kable(expr[1:5,1:10])
+kable(raw[1:5,1:10])
 
 ```
+
+We can already see that there are quite some differences in the number of counts per gene and sample (e.g. 0 vs 13394). Let's have a brief look a the distribution of counts.
+
+```{r count_distribution}
+raw_melted <- melt(raw, value.name="count")
+ggplot(raw_melted, aes(x=log10(count+0.1))) + geom_histogram()
+```
+
+Alright, we see that there are a lot of zeros involved (notice that we used log10 transformation and added pseudo-count to get rid of
+-Inf values).
+Actually, this seems like rather more zeros than we would maybe expect. Let's check also the proportion of zeros per gene and per sample over all genes and samples, respectively.
+
+```{r zero_props}
+zero_props_samples <- unlist(apply(select(raw, -gene_name), 2, function(x) sum(x==0)/length(x)))
+zero_props_genes <- apply(select(raw, -gene_name), 1, function(x) sum(x==0)/length(x))
+head(zero_props_samples)
+toplot <- c(zero_props_genes, zero_props_samples)
+toplot <- cbind.data.frame(proportion_zeros=toplot, margin = c(rep("genes", length(zero_props_genes)),
+                                              rep("samples", length(zero_props_samples))))
+ggplot(toplot, aes(x=proportion_zeros, colour=margin)) + 
+  #facet_wrap(~margin, ncol=2, scales = "free") + 
+  geom_freqpoly(stat="density") + 
+  xlim(c(0,1))
+
+```
+
+The above plot shows the density of the proportion of zero valued entries for each of the genes (red) and each of the samples (samples).
+We can observe that we have several genes which seem to have virtually no counts at all. We will filter these out prior to processing in addition to all genes which do not show any variation across the samples.
+Furthermore, we observe that most of the samples have a moderate amount of non-expressed genes which feeds our expectations.
+
+```{r filter_low, include=F}
+filter <- zero_props_genes > 0.98
+filter <- filter | (apply(select(raw, -gene_name), 1, var) == 0)
+raw <- filter(raw, !filter)
+expr <- filter(expr, !filter)
+
+```
+
+Filtering out lowly expressed and non varying genes leaves us with `r nrow(raw)` genes.
 
 In addition to the expression data, the ARCHS<sup>4</sup> loader provides us with
 a design table containing the following column names(already somewhat adjusted for better readability):
@@ -89,12 +138,15 @@ Below we show for each column of the design matrix the unique values contained
 therein. This is a bit messy, but for now we accept this:
 
 ```{r values_by_cols}
-lapply(colnames(select(design, -sample, -series, -organism)), function(x) {
+lapply(colnames(select(design, -sample, -series, -organism, -description)), function(x) {
   design %>% select(one_of(x)) %>% unique
 })
 ```
 
-Let's also check how many samples we get if we group by the individual 'tissues':
+We can see that the 'tissue' meta data ('source' in the original ARCHS<sup>4</sup> definition) contains several different but Thyroid related tissues.
+In addition, experiments differ by the type of extracted molecules (polyA RNA, i.e. processed mRNA and total RNA, i.e. all RNA found in the cell) and we can see that different instruments (i.e. sequencing machines) have been used to create sequencing information.
+
+For us, the tissue information is most interesting. Let's see what we get in terms of sample counts if we group by the individual 'tissues':
 
 ```{r samples_by_groups}
 design %>% group_by(tissue) %>% 
@@ -104,14 +156,23 @@ design %>% group_by(tissue) %>%
 ```
 
 As we can see there is some diversity in this column. We can also see, however, that we can probably combine some of these annotations since they seem very similar (look e.g. at the 'thyroid tissue' and 'thyroid' annotation).
-If we'd want to extract a dataset as homogenuous as possible from these data we could consider doing this, but for now we stick with what we have.
+If we'd want to extract a dataset as homogeneous as possible from these data we could consider doing this in a more elaborate way, for now we just create a new column in which we define two new tissue groups: *thyroid cancer* and *thyroid*.
+
+```{r merge}
+cancer_idx <- grepl("carci|cancer|adenoma", design$tissue)
+ntissue <- rep("thyroid", nrow(design))
+ntissue[cancer_idx] <- "thyroid (cancerous)"
+design <- mutate(design, tissue_group = ntissue)
+kable(group_by(design, tissue_group) %>% summarise(count=n()))
+```
 
 ## Raw and batch normalized gene expression
 
-Ok, now let's have a look at the actual gene expression data.
+Ok, now let's have a closer look at the actual gene expression data.
 We will have a look at the histogram of all expression values and a heatmap
 of the top 1% most variable genes. We will do this both for the normalized
-data as well as the raw gene expression counts for comparison:
+data as well as the raw gene expression counts for comparison, note that we 
+already filtered out lowly expressed and non-varying genes:
 
 ```{r expression_overview}
 expr_subs <- expr
@@ -125,12 +186,22 @@ raw$gene_var <- apply(raw_subs,1,var)
 raw_subs <- filter(raw, gene_var > quantile(gene_var, .99))
 
 # histogram
+toplot <- raw %>% 
+  mutate(gene_var = NULL, gene_name = NULL) %>%
+  melt(value.name="count")
+ggplot(toplot, aes(x=log10(count+0.1))) + geom_histogram() + 
+  ggtitle("Distribution of raw gene counts")
+
 toplot <- expr %>% 
   mutate(gene_var = NULL, gene_name = NULL) %>%
-  melt
-ggplot(toplot, aes(x=value)) + geom_histogram() + xlab("expression") + 
-  ggtitle("Distribution of expression values.")
+  melt(value.name="expression")
+ggplot(toplot, aes(x=expression)) + geom_histogram() +
+  ggtitle("Distribution of normalized expression values.")
+```
 
+Nothing very unexpected about these two histograms. In general we can observe a slight enrichment of lowly and highly expressed genes and relatively less moderately expressed genes.
+
+```{r expression_correlation}
 # heatmap raw
 raw_corr <- mutate(raw_subs, gene_var = NULL, gene_name = NULL) %>% t %>% cor
 correlation_map(raw_corr, cluster=T, dilution = 100, main = "Correlation map of top 1% variable genes (raw).")
@@ -141,48 +212,67 @@ correlation_map(expr_corr, cluster=T, dilution = 100, main = "Correlation map of
 
 ```
 
-TODO describe what we see
+The first plot, showing the correlations between the raw gene counts, indicates quite a lot of strongly positive correlated genes whereas the second plot showing the normalized data provides a more balanced picture of positively and negatively correlated genes. In both cases, though, we seem to have a certain cluster of genes which evidence a strong positive correlation. These could indicate genes playing important regulatory roles in thyroid (maybe hormone binding related?) which they regulate in a coordinated fashion. 
+
+> NOTE: We could check this assumption by performing e.g. gene ontology enrichment using this identified set of genes and evaluating the significant terms which would pop up in the analysis
 
 ## t-SNE
-Now let's do some tSNE plots to see whether we can see any specific clusters emerging.
-Specifically, we will look at two types of t-SNE plots: One for the raw expression data as 
-was extracted from ARCHS4 and one using the batch normalized data.
+Now let's do some of these t-SNE plots to see whether we can observe any specific clusters emerging.
+Again we will look at two distinct plots: One for the raw expression data and one for the normalized data.
 
 ```{r tsne}
 
 expr_subs <- t(mutate(expr, gene_var = NULL, gene_name = NULL))
 raw_subs <- t(mutate(raw, gene_var = NULL, gene_name = NULL))
 
+set.seed(1)
 # tsne
 reduction <- Rtsne(expr_subs, max_iter = 1000, theta = 0.0, 
-                   dims = 2, perplexity = 30, threads=2)
+                   dims = 3, perplexity = 30, threads=2)
 reduction_raw <- Rtsne(raw_subs, max_iter = 1000, theta = 0.0, 
-                   dims = 2, perplexity = 30, threads=2)
+                   dims = 3, perplexity = 30, threads=2)
 
 # plotting
 toplot <- data.frame(rbind(reduction$Y, reduction_raw$Y))
-colnames(toplot) <- c("dim1", "dim2")
+colnames(toplot) <- c("dim1", "dim2", "dim3")
 
 toplot <- mutate(toplot, type = c(rep("normalized", nrow(reduction$Y)),
                                   rep("raw", nrow(reduction_raw$Y))))
 
-toplot <- cbind(toplot, tissue = design$tissue, instrument = design$instrument,
+toplot <- cbind(toplot, tissue_group = design$tissue_group, tissue = design$tissue, 
+                instrument = design$instrument,
                 series=design$series)
 
-ggplot(toplot, aes(x=dim1, y=dim2, col=tissue)) + 
-  geom_point() + 
-  facet_wrap(~type, nrow=2) +
+cols <- brewer.pal(7, "RdYlBu")
+ggplot(toplot, aes(x=dim1, y=dim2, col=dim3, shape=tissue_group)) + 
+    geom_point() + scale_color_gradient(low=cols[1], high=cols[7]) + 
+  facet_wrap(~type, nrow=2, scale="free") + scale_shape(solid=F) + 
   ggtitle("t-SNE on gene expression data labeled \nby 'tissue' meta-data information")
+
+```
+
+Here each point is a sample and we plotted the first two t-SNE dimensions on the x and y axis and indicate the third dimension as the color of the respective points.
+The shape of the individual points reflects the sample's tissue group, i.e. either 'thyroid' or 'thyroid (cancerous)' as per our definition.
+for the normalized data we can't really see emergin clusters, with the small exception of a group of cancerous samples in the far left of the plot. In the raw count case we see a slight separation of two clusers, which match rather well with our tissue group definitions.
+This indicates that, using the batch normalized expression data we obtain a more or less heterogeneous set of samples, however, the cancerous samples should still be treated with care or even removed prior to any downstream analysis.
+
+Finally, we see whether the used instrument of the sequencing experiment is captued within the first two dimensions of the t-SNE (we use the color to indicate the instrument now, since here we have more than 2 groups and this is easier to get a hold of):
+
+```{r tsne_instrument}
 
 ggplot(toplot, aes(x=dim1, y=dim2, col=instrument)) + 
   geom_point() + 
-  facet_wrap(~type, nrow=2) +
+  facet_wrap(~type, nrow=2, scale="free") +
   ggtitle("t-SNE on gene expression data labeled \nby 'instrument' meta-data information")
 
 
 ```
 
-TODO describe what we see
+In this case we cannot really see any clear clusters emering, with the possible exception of the Illumina HiSeq 4000 in the top left of the raw count plot. Any differences in the data due to the used instrument seem to be successfully removed after batch normalization.
+
+# Conclusion
+In this analysis we took a look at the Thyroid related gene expression data to be found in the ARCHS<sup>4</sup> database.
+In general, we could see that the data are rather diverse in terms of tissue annotation, but can to some extend be merged together to obtain a rather homogeneous tissue annotation. The t-SNE plots indicate that the cancerous samples, as expected, are still quite different to the 'healthy' samples in the data. So in any downstream analysis, one would want to consider removing these samples before executing the analysis in order to obtain create a well defined, homogeneous dataset.
 
 # Session Info
 ```{r}
