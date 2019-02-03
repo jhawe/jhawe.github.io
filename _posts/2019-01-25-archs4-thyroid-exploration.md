@@ -217,7 +217,7 @@ Again we will look at two distinct plots: One for the raw expression data and on
 
 Here each point is a sample and we plotted the first two t-SNE dimensions on the x and y axis and indicate the third dimension as the color of the respective points.
 The shape of the individual points reflects the sample's tissue group, i.e. either 'thyroid' or 'thyroid (cancerous)' as per our definition.
-for the normalized data we can't really see emergin clusters, with the small exception of a group of cancerous samples in the far left of the plot. In the raw count case we see a slight separation of two clusers, which match rather well with our tissue group definitions.
+for the normalized data we can't really see emergin clusters, with the small exception of a group of cancerous samples in the top right of the plot. In the raw count case we see a slight separation of two clusers, which match rather well with our tissue group definitions.
 This indicates that, using the batch normalized expression data we obtain a more or less heterogeneous set of samples, however, the cancerous samples should still be treated with care or even removed prior to any downstream analysis.
 
 Finally, we see whether the used instrument of the sequencing experiment is captued within the first two dimensions of the t-SNE (we use the color to indicate the instrument now, since here we have more than 2 groups and this is easier to get a hold of):
