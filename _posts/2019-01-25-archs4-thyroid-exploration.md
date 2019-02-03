@@ -217,18 +217,22 @@ Again we will look at two distinct plots: One for the raw expression data and on
 
 Here each point is a sample and we plotted the first two t-SNE dimensions on the x and y axis and indicate the third dimension as the color of the respective points.
 The shape of the individual points reflects the sample's tissue group, i.e. either 'thyroid' or 'thyroid (cancerous)' as per our definition.
-for the normalized data we can't really see emergin clusters, with the small exception of a group of cancerous samples in the top right of the plot. In the raw count case we see a slight separation of two clusers, which match rather well with our tissue group definitions.
-This indicates that, using the batch normalized expression data we obtain a more or less heterogeneous set of samples, however, the cancerous samples should still be treated with care or even removed prior to any downstream analysis.
+for the normalized data we can't really see any clusters emerging, with the small exception of a several cancerous samples on the border areas of the plot. In the raw count case we see a slight separation of two clusers which match relatively well with our tissue group definitions (though by no means perfectly).
+This indicates that, using the batch normalized expression data we obtain a more or less heterogeneous set of samples, however, the cancerous samples should still be treated with care or even removed prior to any downstream analysis (seeing that gene expression is often largely disrupted in cancer this also makes sense from a biologcial perspective).
 
 Finally, we see whether the used instrument of the sequencing experiment is captued within the first two dimensions of the t-SNE (we use the color to indicate the instrument now, since here we have more than 2 groups and this is easier to get a hold of):
 
 <img src="/assets/figures/2019-01-25-archs4-thyroid-exploration/tsne_instrument-1.png" title="center" alt="center" style="display: block; margin: auto;" />
 
-In this case we cannot really see any clear clusters emering, with the possible exception of the Illumina HiSeq 4000 in the top left of the raw count plot. Any differences in the data due to the used instrument seem to be successfully removed after batch normalization.
+In this case we cannot really see any clear clusters emerging, with the possible exception of the Illumina HiSeq 4000 in the center of the raw count plot. Anyway, any differences in the data due to the used instrument seem to be successfully removed after batch normalization.
 
 # Conclusion
-In this analysis we took a look at the Thyroid related gene expression data to be found in the ARCHS<sup>4</sup> database.
-In general, we could see that the data are rather diverse in terms of tissue annotation, but can to some extend be merged together to obtain a rather homogeneous tissue annotation. The t-SNE plots indicate that the cancerous samples, as expected, are still quite different to the 'healthy' samples in the data. So in any downstream analysis, one would want to consider removing these samples before executing the analysis in order to obtain create a well defined, homogeneous dataset.
+In this analysis we took a look at the thyroid related gene expression data available in the ARCHS<sup>4</sup> database.
+In general, we could see that the data are rather diverse in terms of tissue annotation, but can to some extend be merged together to obtain a more homogeneous annotation. The t-SNE plots indicate that the cancerous samples, as expected, are still quite different to the 'healthy' samples in the data. So in any downstream analysis, one would want to consider removing these samples in order to obtain a well defined, homogeneous dataset from which further conclusions can be drawn.
+
+That's it for today, hope you enjoyed the analysis and I'm lookgin forward to any feedback and suggestions for this post.
+
+Until then, farewell! 
 
 # Session Info
 
