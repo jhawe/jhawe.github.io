@@ -19,7 +19,7 @@ library(pheatmap)
 library(Rtsne)
 
 # set default theme
-theme_set(theme_bw())
+theme_set(theme_dark())
 
 source("../_scripts/plotting.R")
 
@@ -226,6 +226,7 @@ expr_subs <- t(mutate(expr, gene_var = NULL, gene_name = NULL))
 raw_subs <- t(mutate(raw, gene_var = NULL, gene_name = NULL))
 
 set.seed(1)
+
 # tsne
 reduction <- Rtsne(expr_subs, max_iter = 1000, theta = 0.0, 
                    dims = 3, perplexity = 30, threads=2)
