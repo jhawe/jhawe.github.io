@@ -112,7 +112,7 @@ overview plots for our selected variables over the different leagues.
 
 ```{r overview_plots}
 # set a less obtrusive style
-theme_set(theme_bw())
+theme_set(theme_linedraw())
 
 # plot overviews
 
