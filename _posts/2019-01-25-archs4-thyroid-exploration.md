@@ -255,23 +255,28 @@ Until then, farewell!
 ## [1] stats     graphics  grDevices utils     datasets  base     
 ## 
 ## other attached packages:
-##  [1] RColorBrewer_1.1-2 bindrcpp_0.2.2     Rtsne_0.15        
-##  [4] pheatmap_1.0.12    reshape2_1.4.3     forcats_0.3.0     
+##  [1] RColorBrewer_1.1-2 Rtsne_0.15         pheatmap_1.0.12   
+##  [4] bindrcpp_0.2.2     reshape2_1.4.3     forcats_0.3.0     
 ##  [7] stringr_1.3.1      dplyr_0.7.8        purrr_0.3.0       
 ## [10] readr_1.3.1        tidyr_0.8.2        tibble_2.0.1      
 ## [13] ggplot2_3.1.0      tidyverse_1.2.1    knitr_1.21        
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] tidyselect_0.2.5 xfun_0.4         haven_2.0.0      lattice_0.20-35 
-##  [5] colorspace_1.4-0 generics_0.0.2   utf8_1.1.4       rlang_0.3.1     
-##  [9] pillar_1.3.1     glue_1.3.0       withr_2.1.2      modelr_0.1.2    
-## [13] readxl_1.2.0     bindr_0.1.1      plyr_1.8.4       munsell_0.5.0   
-## [17] gtable_0.2.0     cellranger_1.1.0 rvest_0.3.2      evaluate_0.12   
-## [21] labeling_0.3     fansi_0.4.0      highr_0.7        broom_0.5.1     
-## [25] methods_3.4.4    Rcpp_1.0.0       scales_1.0.0     backports_1.1.3 
-## [29] jsonlite_1.6     hms_0.4.2        digest_0.6.18    stringi_1.2.4   
-## [33] grid_3.4.4       cli_1.0.1        tools_3.4.4      magrittr_1.5    
-## [37] lazyeval_0.2.1   crayon_1.3.4     pkgconfig_2.0.2  xml2_1.2.0      
-## [41] lubridate_1.7.4  assertthat_0.2.0 httr_1.4.0       rstudioapi_0.9.0
-## [45] R6_2.3.0         nlme_3.1-131     compiler_3.4.4
+##  [1] tidyselect_0.2.5  xfun_0.4          haven_2.0.0      
+##  [4] lattice_0.20-35   colorspace_1.4-0  generics_0.0.2   
+##  [7] viridisLite_0.3.0 utf8_1.1.4        rlang_0.3.1      
+## [10] pillar_1.3.1      glue_1.3.0        withr_2.1.2      
+## [13] modelr_0.1.2      readxl_1.2.0      bindr_0.1.1      
+## [16] plyr_1.8.4        munsell_0.5.0     gtable_0.2.0     
+## [19] cellranger_1.1.0  rvest_0.3.2       codetools_0.2-15 
+## [22] evaluate_0.12     labeling_0.3      fansi_0.4.0      
+## [25] highr_0.7         broom_0.5.1       methods_3.4.4    
+## [28] Rcpp_1.0.0        scales_1.0.0      backports_1.1.3  
+## [31] jsonlite_1.6      hms_0.4.2         digest_0.6.18    
+## [34] stringi_1.2.4     grid_3.4.4        cli_1.0.1        
+## [37] tools_3.4.4       magrittr_1.5      lazyeval_0.2.1   
+## [40] crayon_1.3.4      pkgconfig_2.0.2   xml2_1.2.0       
+## [43] lubridate_1.7.4   assertthat_0.2.0  httr_1.4.0       
+## [46] rstudioapi_0.9.0  R6_2.3.0          nlme_3.1-131     
+## [49] compiler_3.4.4
 {% endhighlight %}
