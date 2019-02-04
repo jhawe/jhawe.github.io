@@ -377,19 +377,31 @@ available on CRAN. In the model we use all our variables as inputs and try to mo
 
 
 {% highlight text %}
-## Error in library(randomForest): there is no package called 'randomForest'
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## Error in randomForest(LeagueIndex ~ ., data = data, ntree = 10000): could not find function "randomForest"
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## Error in print(model): object 'model' not found
+## 
+## Call:
+##  randomForest(formula = LeagueIndex ~ ., data = data, ntree = 10000) 
+##                Type of random forest: classification
+##                      Number of trees: 10000
+## No. of variables tried at each split: 2
+## 
+##         OOB estimate of  error rate: 64.22%
+## Confusion matrix:
+##             Bronze Silver Gold Platinum Diamond Master GrandMaster
+## Bronze          49     59   34       23       1      1           0
+## Silver          49     84   97       96      17      4           0
+## Gold            30     80  144      198      82     19           0
+## Platinum         9     54  168      297     208     74           1
+## Diamond          0     11   66      208     304    212           2
+## Master           0      1    9       70     223    314           4
+## GrandMaster      0      0    0        0       5     28           2
+##             class.error
+## Bronze        0.7065868
+## Silver        0.7579251
+## Gold          0.7396022
+## Platinum      0.6337855
+## Diamond       0.6214197
+## Master        0.4943639
+## GrandMaster   0.9428571
 {% endhighlight %}
 
 ## Performance
@@ -408,13 +420,18 @@ two classes?
 
 
 {% highlight text %}
-## Error in randomForest(LeagueIndex ~ ., data = sc_mock, ntree = 10000): could not find function "randomForest"
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## Error in print(model_mock): object 'model_mock' not found
+## 
+## Call:
+##  randomForest(formula = LeagueIndex ~ ., data = sc_mock, ntree = 10000) 
+##                Type of random forest: classification
+##                      Number of trees: 10000
+## No. of variables tried at each split: 2
+## 
+##         OOB estimate of  error rate: 20.98%
+## Confusion matrix:
+##       bad good class.error
+## bad  1537  341   0.1815761
+## good  359 1100   0.2460589
 {% endhighlight %}
 
 As we can see the OOB is a lot better at about 22%, it's something!
@@ -424,7 +441,11 @@ Finally, let's quickly check on the feature importance for the mock predictions.
 
 
 {% highlight text %}
-## Error in eval(expr, envir, enclos): object 'model_mock' not found
+##                 MeanDecreaseGini
+## TotalHours              240.3666
+## APM                     472.6345
+## ActionLatency           577.5120
+## SelectByHotkeys         351.2694
 {% endhighlight %}
 
 The MeanDecreaseGini is highest for the ActionLatency, suggesting
@@ -477,9 +498,11 @@ Until then, farewell!
 ## [1] stats     graphics  grDevices utils     datasets  base     
 ## 
 ## other attached packages:
-##  [1] bindrcpp_0.2.2  reshape2_1.4.3  forcats_0.3.0   stringr_1.3.1  
-##  [5] dplyr_0.7.8     purrr_0.3.0     readr_1.3.1     tidyr_0.8.2    
-##  [9] tibble_2.0.1    ggplot2_3.1.0   tidyverse_1.2.1 knitr_1.21     
+##  [1] randomForest_4.6-14 bindrcpp_0.2.2      reshape2_1.4.3     
+##  [4] forcats_0.3.0       stringr_1.3.1       dplyr_0.7.8        
+##  [7] purrr_0.3.0         readr_1.3.1         tidyr_0.8.2        
+## [10] tibble_2.0.1        ggplot2_3.1.0       tidyverse_1.2.1    
+## [13] knitr_1.21         
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] tidyselect_0.2.5  xfun_0.4          haven_2.0.0      
@@ -488,15 +511,14 @@ Until then, farewell!
 ## [10] pillar_1.3.1      glue_1.3.0        withr_2.1.2      
 ## [13] modelr_0.1.2      readxl_1.2.0      bindr_0.1.1      
 ## [16] plyr_1.8.4        munsell_0.5.0     gtable_0.2.0     
-## [19] cellranger_1.1.0  rvest_0.3.2       codetools_0.2-15 
-## [22] evaluate_0.12     labeling_0.3      fansi_0.4.0      
-## [25] highr_0.7         broom_0.5.1       methods_3.4.4    
-## [28] Rcpp_1.0.0        scales_1.0.0      backports_1.1.3  
-## [31] jsonlite_1.6      hms_0.4.2         digest_0.6.18    
-## [34] stringi_1.2.4     grid_3.4.4        cli_1.0.1        
-## [37] tools_3.4.4       magrittr_1.5      lazyeval_0.2.1   
-## [40] crayon_1.3.4      pkgconfig_2.0.2   xml2_1.2.0       
-## [43] lubridate_1.7.4   assertthat_0.2.0  httr_1.4.0       
-## [46] rstudioapi_0.9.0  R6_2.3.0          nlme_3.1-131     
-## [49] compiler_3.4.4
+## [19] cellranger_1.1.0  rvest_0.3.2       evaluate_0.12    
+## [22] labeling_0.3      fansi_0.4.0       highr_0.7        
+## [25] broom_0.5.1       methods_3.4.4     Rcpp_1.0.0       
+## [28] scales_1.0.0      backports_1.1.3   jsonlite_1.6     
+## [31] hms_0.4.2         digest_0.6.18     stringi_1.2.4    
+## [34] grid_3.4.4        cli_1.0.1         tools_3.4.4      
+## [37] magrittr_1.5      lazyeval_0.2.1    crayon_1.3.4     
+## [40] pkgconfig_2.0.2   xml2_1.2.0        lubridate_1.7.4  
+## [43] assertthat_0.2.0  httr_1.4.0        rstudioapi_0.9.0 
+## [46] R6_2.3.0          nlme_3.1-131      compiler_3.4.4
 {% endhighlight %}
