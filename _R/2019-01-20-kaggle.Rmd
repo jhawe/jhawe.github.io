@@ -16,6 +16,7 @@ For now, we simply get the first 100 datasets available which are tagged with 's
 
 ```{bash, eval=FALSE}
 mkdir kaggle_dataset_lists
+mkdir datasets
 # we get 20 results per page, so we get 5 pages.
 We remove the header and add it manually
 for i in {1..5} ; do
@@ -34,4 +35,6 @@ sel=$(sort -R kaggle_dataset_lists/sports.csv | head -1)
 echo $sel >> kaggle_dataset_lists/sports_selected.csv
 grep -v "$sel" kaggle_dataset_lists/sports.csv > temp && mv temp kaggle_dataset_lists/sports.csv
 dataset=`echo $sel | cut -f 1 -d ","`
+kaggle datasets download --unzip -p datasets/ $dataset
+
 ```

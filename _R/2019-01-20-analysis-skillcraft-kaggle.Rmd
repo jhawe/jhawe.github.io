@@ -87,7 +87,9 @@ kable(sc_sub %>%
 Alright, the quick check does not reveal any major problems with the data, let's go on.
 Within the game there are 'leagues' which are encoded in these data with numbers from 1-7 (7 being the highest league).
 We don't like this representation very much, let's repace it with some more 'speaking' names.
-Note: We keep the correct order of the leagues which is helpful for understanding later plots.
+
+> NOTE: We keep the correct order of the leagues which is helpful for understanding later plots by using ordered factors
+
 Let's have a look at the top of the new table:
 
 ```{r rename_leagues}
@@ -206,11 +208,9 @@ and about 114 years. Though we appreciate the effort, for the sake of our furthe
 analysis we should filter out unreasonable total hours in general.
 
 
-*Note*: There's a chance we interpreted the dataset wrong, since there is no real
-description available on Kaggle. Anyway, for now we just go with it.
+> NOTE: There's a chance we interpreted the dataset wrong, since there is no real description available on Kaggle. Anyway, for now we just go with it.
 
-
-We remove all players with TotalHours > `r max_totalhours` (10 years) and check
+We remove all players with TotalHours > `r round(max_totalhours, digits=2)` (10 years) and check
 out the plots again:
 
 ```{r totalhours_filtered}
@@ -292,7 +292,12 @@ lm_apm <- lm(APM~LeagueIndex, data=sc_sub)
 lm_thours <- lm(TotalHours~LeagueIndex, data=sc_sub)
 lm_alatency <- lm(ActionLatency~LeagueIndex, data=sc_sub)
 lm_hotkeys <- lm(SelectByHotkeys~LeagueIndex, data=sc_sub)
+```
 
+Here we can see quite clearly, that for each of the chosen variables, the LeagueIndex is indeed
+indicative of their values. We can further assess this using linear models. Now we train and report a linear model using LeagueIndex as the independent and our respective variables aus the dependent variables.
+
+```{r}
 print("Summary for APM model:")
 summary(lm_apm)
 print("Summary for TotalHours model:")
@@ -304,8 +309,8 @@ summary(lm_hotkeys)
 
 ```
 
-Here we can see quite clearly, that for each of the chosen variables, the LeagueIndex is indeed
-indicative of their values. We should explore this a bit more, but for now let's
+As you can see, again we observe that we have a linear dependence between all our variabels and the LeagueIndex. 
+We probably should explore this a bit more, but for now let's
 go on with predicting league placement!
 
 # Predicting league placement
@@ -314,13 +319,9 @@ Great! Some machine learning for predicting league placement, eh? (don't worry,
 this will be very high-level and we don't go into much detail for now).
 We build a random forest model (i.e. an ensembl of decision trees, [wiki link](https://en.wikipedia.org/wiki/Random_forest)) using
 the [randomForest package](https://cran.r-project.org/web/packages/randomForest/index.html) by Breiman and Cutler
-available on CRAN. In the model we use all our variables as inputs and try to
-learn the LeagueIndex, using default parameters except for the number of trees
-which we set to 10,000.
+available on CRAN. In the model we use all our variables as inputs and try to model the LeagueIndex using default parameters except for the number of trees which we set to 10,000.
 
-NOTE: Again, this is not a very sophisticated approach as we do it here,
-we just wanna see how good we can get by blindly applying this model. We'll probably return to this at a
-later point.
+> NOTE: Again, this is not a very sophisticated approach as we do it here, we just wanna see how good we can get by blindly applying this model. We'll probably return to this at a later point.
 
 ```{r randomForest, cache=T}
 
