@@ -84,6 +84,17 @@ author:
   avatar   : "/assets/images/avatar3.png"
   bio      : "PhD student (computational biology)"
   location : "Munich, Germany"
+  links:
+  links:
+    - label: "Email"
+      icon: "fas fa-fw fa-envelope-square"
+      url: "mailto:johann.hawe@gmail.com"
+    - label: "Website"
+      icon: "fas fa-fw fa-link"
+      url: "https://jhawe.github.io"
+    - label: "Twitter"
+      icon: "fab fa-fw fa-twitter-square"
+      url: "https://twitter.com/johannhawe"
 
 category_archive:
   type: jekyll-archives
