@@ -210,13 +210,9 @@ grid.arrange(xmp, nullGrob(), g, ymp,
              ncol = 2, widths = wr, heights = hr)
 {% endhighlight %}
 
+<img src="/assets/figures/2019-05-08-genome-wide-pairs-plot/unnamed-chunk-4-1.png" title="center" alt="center" style="display: block; margin: auto;" />
 
-
-{% highlight text %}
-## Error in grid.arrange(xmp, nullGrob(), g, ymp, ncol = 2, widths = wr, : could not find function "grid.arrange"
-{% endhighlight %}
-
-So, as you can see, we create our final plot by arrange three distinct plots in a single frame using the *grid.arrange* function from the *gridExtra* package.
+So, as you can see, we create our final plot by arrange three distinct plots in a single frame using the *grid.arrange* function from the *gridExtra* package (including the *nullGrob()* method from the *grid* package).
 This actually looks rather good! So good in fact that, we are content for now and stop tweaking the plot (I'm lazy today). 
 Anyway, we can see that there are some SNPs or LD blocks which exhibit a huge number of trans associations as well as some regions in the genome which harbor a relatively larger number of genes which are influenced by these SNPs in trans as compared to other regions.
 
@@ -245,21 +241,21 @@ Until then, farewell!
 ## [5] LC_TIME=English_United States.1252    
 ## 
 ## attached base packages:
-## [1] parallel  stats4    stats     graphics  grDevices utils     datasets 
-## [8] methods   base     
+##  [1] grid      parallel  stats4    stats     graphics  grDevices utils    
+##  [8] datasets  methods   base     
 ## 
 ## other attached packages:
 ##  [1] BSgenome.Hsapiens.UCSC.hg19_1.4.0 BSgenome_1.48.0                  
 ##  [3] rtracklayer_1.40.6                Biostrings_2.48.0                
-##  [5] XVector_0.20.0                    GenomicRanges_1.32.7             
-##  [7] GenomeInfoDb_1.16.0               IRanges_2.14.12                  
-##  [9] S4Vectors_0.18.3                  BiocGenerics_0.26.0              
-## [11] reshape2_1.4.3                    forcats_0.4.0                    
-## [13] stringr_1.4.0                     dplyr_0.8.0.1                    
-## [15] purrr_0.3.2                       readr_1.3.1                      
-## [17] tidyr_0.8.3                       tibble_2.1.1                     
-## [19] ggplot2_3.1.1                     tidyverse_1.2.1                  
-## [21] knitr_1.22                       
+##  [5] XVector_0.20.0                    gridExtra_2.3                    
+##  [7] GenomicRanges_1.32.7              GenomeInfoDb_1.16.0              
+##  [9] IRanges_2.14.12                   S4Vectors_0.18.3                 
+## [11] BiocGenerics_0.26.0               reshape2_1.4.3                   
+## [13] forcats_0.4.0                     stringr_1.4.0                    
+## [15] dplyr_0.8.0.1                     purrr_0.3.2                      
+## [17] readr_1.3.1                       tidyr_0.8.3                      
+## [19] tibble_2.1.1                      ggplot2_3.1.1                    
+## [21] tidyverse_1.2.1                   knitr_1.22                       
 ## 
 ## loaded via a namespace (and not attached):
 ##  [1] Rcpp_1.0.1                  lubridate_1.7.4            
@@ -267,28 +263,29 @@ Until then, farewell!
 ##  [5] assertthat_0.2.1            R6_2.4.0                   
 ##  [7] cellranger_1.1.0            plyr_1.8.4                 
 ##  [9] backports_1.1.4             evaluate_0.13              
-## [11] httr_1.4.0                  pillar_1.3.1               
-## [13] zlibbioc_1.26.0             rlang_0.3.4                
-## [15] lazyeval_0.2.2              curl_3.3                   
-## [17] readxl_1.3.1                rstudioapi_0.10            
-## [19] Matrix_1.2-14               BiocParallel_1.14.2        
-## [21] RCurl_1.95-4.12             munsell_0.5.0              
-## [23] DelayedArray_0.6.6          broom_0.5.2                
-## [25] compiler_3.5.1              modelr_0.1.4               
-## [27] xfun_0.6                    pkgconfig_2.0.2            
-## [29] tidyselect_0.2.5            SummarizedExperiment_1.10.1
-## [31] GenomeInfoDbData_1.1.0      matrixStats_0.54.0         
-## [33] XML_3.98-1.19               crayon_1.3.4               
-## [35] withr_2.1.2                 GenomicAlignments_1.16.0   
-## [37] bitops_1.0-6                grid_3.5.1                 
-## [39] nlme_3.1-137                jsonlite_1.6               
-## [41] gtable_0.3.0                magrittr_1.5               
-## [43] scales_1.0.0                cli_1.1.0                  
-## [45] stringi_1.4.3               xml2_1.2.0                 
-## [47] generics_0.0.2              tools_3.5.1                
-## [49] Biobase_2.40.0              glue_1.3.1                 
-## [51] hms_0.4.2                   colorspace_1.4-1           
-## [53] rvest_0.3.3                 haven_2.1.0
+## [11] highr_0.8                   httr_1.4.0                 
+## [13] pillar_1.3.1                zlibbioc_1.26.0            
+## [15] rlang_0.3.4                 lazyeval_0.2.2             
+## [17] curl_3.3                    readxl_1.3.1               
+## [19] rstudioapi_0.10             Matrix_1.2-14              
+## [21] labeling_0.3                BiocParallel_1.14.2        
+## [23] RCurl_1.95-4.12             munsell_0.5.0              
+## [25] DelayedArray_0.6.6          broom_0.5.2                
+## [27] compiler_3.5.1              modelr_0.1.4               
+## [29] xfun_0.6                    pkgconfig_2.0.2            
+## [31] tidyselect_0.2.5            SummarizedExperiment_1.10.1
+## [33] GenomeInfoDbData_1.1.0      matrixStats_0.54.0         
+## [35] XML_3.98-1.19               crayon_1.3.4               
+## [37] withr_2.1.2                 GenomicAlignments_1.16.0   
+## [39] bitops_1.0-6                nlme_3.1-137               
+## [41] jsonlite_1.6                gtable_0.3.0               
+## [43] magrittr_1.5                scales_1.0.0               
+## [45] cli_1.1.0                   stringi_1.4.3              
+## [47] xml2_1.2.0                  generics_0.0.2             
+## [49] tools_3.5.1                 Biobase_2.40.0             
+## [51] glue_1.3.1                  hms_0.4.2                  
+## [53] colorspace_1.4-1            rvest_0.3.3                
+## [55] haven_2.1.0
 {% endhighlight %}
 
 
