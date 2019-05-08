@@ -212,15 +212,16 @@ grid.arrange(xmp, nullGrob(), g, ymp,
 
 <img src="/assets/figures/2019-05-08-genome-wide-pairs-plot/unnamed-chunk-4-1.png" title="center" alt="center" style="display: block; margin: auto;" />
 
-So, as you can see, we create our final plot by arrange three distinct plots in a single frame using the *grid.arrange* function from the *gridExtra* package (including the *nullGrob()* method from the *grid* package).
-This actually looks rather good! So good in fact that, we are content for now and stop tweaking the plot (I'm lazy today). 
-Anyway, we can see that there are some SNPs or LD blocks which exhibit a huge number of trans associations as well as some regions in the genome which harbor a relatively larger number of genes which are influenced by these SNPs in trans as compared to other regions.
+So, as you can see, we create our final plot by arranging three distinct plots in a single frame using the *grid.arrange* function from the *gridExtra* package (including the *nullGrob()* method from the *grid* package).
+The row and column annotations show the total number of entities falling into the respective row or column and the red dots in the main plot indicate the presence of a SNP (columns) associated with a gene (row) for the two chromosome regions.
+This actually looks rather good (well, good enough)! So good in fact that, we are content for now and stop tweaking the plot (I'm lazy today). 
+Anyway, we can see that there are some SNPs or LD blocks which exhibit a huge number of trans associations as well as some regions in the genome which harbor a relatively larger number of genes which are influenced by those SNPs in trans as compared to other regions.
 
 
 ## Conclusion
 Alright, you have seen how we can get an impression of genome-wide results from an eQTL study, just by using tidyverse/ggplot2 and the GenomicRanges packages in R. 
 Of course, there are different ways of doing this, for example you could try to do a circos plot using the [ggbio](https://bioconductor.org/packages/release/bioc/html/ggbio.html) package in R or you can add continuous information about the number of eQTLs per bin directly in the main matrix plot (e.g. using the *fill* aesthetics).
-Maybe I'll extend the plot later to show how to do this, but in the meanwhile: have fun plaiyng around with this example!
+Maybe I'll extend the plot later to show how to do this, but in the meanwhile: have fun playing around with this example!
 
 Until then, farewell!
 
