@@ -2,6 +2,8 @@
 main:
   - title: "Home"
     url: /
+  - title: "Genome-wide pairs matrix"
+    url: /genomic-pairs-matrix/
   - title: "Thyroid expression"
     url: /archs4-thyroid-analysis/
   - title: "SkillCraft"
