@@ -220,6 +220,10 @@ plot_grid(xmp, nullGrob(), g, ymp,
 <img src="/assets/figures/2019-05-08-genome-wide-pairs-plot/unnamed-chunk-4-1.png" title="center" alt="center" style="display: block; margin: auto;" />
 
 So, as you can see, we create our final plot by arranging three distinct plots in a single frame using quite some functions from different packages (e.g. *plot_grid* from the *cowplot* package, and the *nullGrob()* method from the *grid* package).
+
+> NOTE: it oculd happen that the axis are not perfectly aligned with the margins. the plot_grid() function provides an 
+> arguments to tackle this (*align* and *axis*) but it can get tricky to align the axis in both dimensions!
+
 The row and column annotations show the total number of entities falling into the respective row or column and the red dots in the main plot indicate the presence of a SNP (columns) associated with a gene (row) for the two chromosome regions.
 This actually looks rather good (well, good enough)! So good in fact that, we are content for now and stop tweaking the plot (I'm lazy today). 
 Anyway, we can see that there are some SNPs or LD blocks which exhibit a huge number of trans associations as well as some regions in the genome which harbor a relatively larger number of genes which are influenced by those SNPs in trans as compared to other regions.
