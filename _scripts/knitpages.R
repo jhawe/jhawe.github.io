@@ -30,7 +30,7 @@ KnitPost <- function(input, outfile, figsfolder, cachefolder, base.url="/") {
 }
 
 knit_folder <- function(infolder, outfolder, figsfolder, cachefolder) {
-    for (infile in list.files(infolder, pattern = "*.Rmd", full.names = TRUE)) {
+    for (infile in list.files(infolder, pattern = "*.Rmd$", full.names = TRUE)) {
         pattern = "\\d\\d\\d\\d\\-\\d\\d\\-\\d\\d\\-"
         print(infile)
         # folder = ifelse(grepl(pattern, infile), outfolder, "pages")
