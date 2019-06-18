@@ -1,12 +1,16 @@
 ---
-title: "REMAP scraper"
-author: "Johann Hawe"
+title: "A ReMAP scraping script"
 date: "June 18, 2019"
-output: html_document
+excerpt: "A brief script to download and present REMAP cell line transcription factor information"
+tags: "remap transcription factor celltype xml table parsing"
+toc: true
+permalink: /remap-scraping/
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+# set options
+knitr::opts_chunk$set(echo = FALSE, fig.align="center",
+  message = FALSE, warning=FALSE, fig_width=10)
 ```
 
 # Introduction
@@ -21,7 +25,7 @@ First, we load needed libraries and read in the table. We could optionally save 
 > NOTE: We load the cowplot package only to get a nice and lightweight default theme for ggplot set up. Also,
 > I can really recommend the package for publication ready figures.
 
-```{r}
+```{r echo=T}
 library(tidyverse)
 library(cowplot)
 library(XML)
@@ -41,7 +45,7 @@ This was easy enough, we got the table and transformed it into a tibble, getting
 
 In the next step, we separate the table by the TFs in each row (using the *separate_rows()* method). This yields for each cell type individual rows for each available TF.
 
-```{r}
+```{r echo=T}
 # separate
 remap_sep <- remap %>%
   separate_rows(Transcription.Factor)
@@ -57,19 +61,19 @@ We can see that the cell-type with the most TFs measured is the K562 (used in [E
 
 Finally, we generate the cumulative numbers we want to plot in the end. Since we always want to add only the cell-line contributing most TFs in  each step, we do this manually and evaluate the overlap of the TF lists on the way. This might be a somewhat crude implementation, but it does the job.
 
-```{r}
+```{r echo=T}
 # list of cell types to process
 cell_types <- as.character(remap_counts$Cell.Type)
 
-# get all TFs available fro the first cell-type (which has 
+# get all TFs available fro the first cell-type (which has
 # the maximum number of TFs since we use the sorted list)
 tfs <- remap_sep %>% filter(Cell.Type == cell_types[1]) %>%
-  select(Transcription.Factor) %>% 
+  select(Transcription.Factor) %>%
   unlist(use.names=F)
 
 # prepare result df
-df <- data.frame(cell_type=cell_types[1], 
-                 number_contr_tfs=length(tfs), 
+df <- data.frame(cell_type=cell_types[1],
+                 number_contr_tfs=length(tfs),
                  contr_tfs=paste0(tfs, collapse=","),
                  stringsAsFactors = F)
 
@@ -80,11 +84,11 @@ while(length(cell_types) > 0) {
   max_contr <- -1
   max_contr_ct <- NA_character_
   max_contr_tfs <- NA_character_
-  
+
   # check each remaining cell_type for max contribution
   for(i in 1:length(cell_types)) {
     ct_tfs <- filter(remap_sep, Cell.Type == cell_types[i]) %>%
-      select(Transcription.Factor) %>% 
+      select(Transcription.Factor) %>%
       unlist(use.names=F)
     # how many are not yet in the list of all tfs?
     new_tfs <- setdiff(ct_tfs, tfs)
@@ -95,11 +99,11 @@ while(length(cell_types) > 0) {
       max_contr_ct <- cell_types[i]
     }
   }
-  
+
   # in that case, we didn't have any new TFs..
   if(max_contr == 0) {
     # add all remaining cell-types to the df
-    remaining <- rbind(data.frame(cell_type=cell_types, 
+    remaining <- rbind(data.frame(cell_type=cell_types,
                            number_contr_tfs=rep(0, length(cell_types)),
                            contr_tfs=rep(NA, length(cell_types)),
                            stringsAsFactors = F))
@@ -112,8 +116,6 @@ while(length(cell_types) > 0) {
   df <- rbind.data.frame(df, row)
   cell_types <- setdiff(cell_types, max_contr_ct)
 }
-
-
 ```
 
 ## Plotting
@@ -122,12 +124,12 @@ Now we can use the accumulated TF contributions for plotting with [ggplot](https
 We filter for contributions $\gt 0$ and calculate the cumulative sum for the y-axis.
 We further add the cell type labels to each data point using the *geom_text()* ggplot layer.
 
-```{r}
+```{r echo=T}
 df_sub <- subset(df, number_contr_tfs > 0)
-ggplot(df_sub, aes(x=1:nrow(df_sub), y=cumsum(number_contr_tfs))) + 
-  geom_line() + 
-  geom_point(size=2) + 
-  geom_text(aes(label=cell_type), vjust=0, hjust=-0.5, check_overlap = F, angle=-25) + 
+ggplot(df_sub, aes(x=1:nrow(df_sub), y=cumsum(number_contr_tfs))) +
+  geom_line() +
+  geom_point(size=2) +
+  geom_text(aes(label=cell_type), vjust=0, hjust=-0.5, check_overlap = F, angle=-25) +
   scale_y_continuous(limits=c(0,500)) +
   labs(title="Cumulative sum of number of new TFs contributed by each cell-type",
        subtitle = "Sorted by total contribution",
@@ -136,8 +138,7 @@ ggplot(df_sub, aes(x=1:nrow(df_sub), y=cumsum(number_contr_tfs))) +
 ```
 
 # Summary
-That's all! This was a quick (not necessarily dirty) way of extracting a HTML table from a website and generating a brief overview.
-
+That's all! This was a quick (not **necessarily** dirty) way of extracting a HTML table from a website and generating a brief overview.
 
 Until then, farewell!
 
@@ -145,4 +146,3 @@ Until then, farewell!
 ```{r}
 sessionInfo()
 ```
-

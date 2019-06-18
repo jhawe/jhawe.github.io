@@ -4,6 +4,8 @@ main:
     url: /
   - title: "Genome-wide pairs matrix"
     url: /genomic-pairs-matrix/
+  - title: "ReMAP scraping"
+    url: /remap-scraping/
   - title: "Thyroid expression"
     url: /archs4-thyroid-analysis/
   - title: "SkillCraft"

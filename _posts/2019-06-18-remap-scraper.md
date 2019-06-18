@@ -1,8 +1,10 @@
 ---
-title: "REMAP scraper"
-author: "Johann Hawe"
+title: "A ReMAP scraping script"
 date: "June 18, 2019"
-output: html_document
+excerpt: "A brief script to download and present REMAP cell line transcription factor information"
+tags: "remap transcription factor celltype xml table parsing"
+toc: true
+permalink: /remap-scraping/
 ---
 
 
@@ -22,146 +24,12 @@ First, we load needed libraries and read in the table. We could optionally save 
 
 {% highlight r %}
 library(tidyverse)
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## Warning: package 'tidyverse' was built under R version 3.5.3
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## -- Attaching packages ---------------------------------- tidyverse 1.2.1 --
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## v ggplot2 3.1.1       v purrr   0.3.2  
-## v tibble  2.1.1       v dplyr   0.8.0.1
-## v tidyr   0.8.3       v stringr 1.4.0  
-## v readr   1.3.1       v forcats 0.4.0
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## Warning: package 'ggplot2' was built under R version 3.5.3
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## Warning: package 'tibble' was built under R version 3.5.3
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## Warning: package 'tidyr' was built under R version 3.5.3
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## Warning: package 'readr' was built under R version 3.5.3
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## Warning: package 'purrr' was built under R version 3.5.3
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## Warning: package 'dplyr' was built under R version 3.5.3
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## Warning: package 'stringr' was built under R version 3.5.3
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## Warning: package 'forcats' was built under R version 3.5.3
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## -- Conflicts ------------------------------------- tidyverse_conflicts() --
-## x dplyr::filter() masks stats::filter()
-## x dplyr::lag()    masks stats::lag()
-{% endhighlight %}
-
-
-
-{% highlight r %}
 library(cowplot)
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## Warning: package 'cowplot' was built under R version 3.5.3
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## 
-## Attaching package: 'cowplot'
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## The following object is masked from 'package:ggplot2':
-## 
-##     ggsave
-{% endhighlight %}
-
-
-
-{% highlight r %}
 library(XML)
-{% endhighlight %}
 
-
-
-{% highlight text %}
-## Warning: package 'XML' was built under R version 3.5.3
-{% endhighlight %}
-
-
-
-{% highlight r %}
 # read and extract HTML table
 remap <- readHTMLTable("http://tagc.univ-mrs.fr/remap/index.php?page=ct")[[1]] %>%
   as_tibble(.name_repair = "universal")
-{% endhighlight %}
-
-
-
-{% highlight text %}
-## New names:
-## * `Cell Type` -> Cell.Type
-## * `Number of Public datasets` -> Number.of.Public.datasets
-## * `Number of Encode datasets` -> Number.of.Encode.datasets
-## * `BTO ID` -> BTO.ID
-## * `Transcription Factor` -> Transcription.Factor
-{% endhighlight %}
-
-
-
-{% highlight r %}
 remap
 {% endhighlight %}
 
@@ -238,15 +106,15 @@ Finally, we generate the cumulative numbers we want to plot in the end. Since we
 # list of cell types to process
 cell_types <- as.character(remap_counts$Cell.Type)
 
-# get all TFs available fro the first cell-type (which has 
+# get all TFs available fro the first cell-type (which has
 # the maximum number of TFs since we use the sorted list)
 tfs <- remap_sep %>% filter(Cell.Type == cell_types[1]) %>%
-  select(Transcription.Factor) %>% 
+  select(Transcription.Factor) %>%
   unlist(use.names=F)
 
 # prepare result df
-df <- data.frame(cell_type=cell_types[1], 
-                 number_contr_tfs=length(tfs), 
+df <- data.frame(cell_type=cell_types[1],
+                 number_contr_tfs=length(tfs),
                  contr_tfs=paste0(tfs, collapse=","),
                  stringsAsFactors = F)
 
@@ -257,11 +125,11 @@ while(length(cell_types) > 0) {
   max_contr <- -1
   max_contr_ct <- NA_character_
   max_contr_tfs <- NA_character_
-  
+
   # check each remaining cell_type for max contribution
   for(i in 1:length(cell_types)) {
     ct_tfs <- filter(remap_sep, Cell.Type == cell_types[i]) %>%
-      select(Transcription.Factor) %>% 
+      select(Transcription.Factor) %>%
       unlist(use.names=F)
     # how many are not yet in the list of all tfs?
     new_tfs <- setdiff(ct_tfs, tfs)
@@ -272,11 +140,11 @@ while(length(cell_types) > 0) {
       max_contr_ct <- cell_types[i]
     }
   }
-  
+
   # in that case, we didn't have any new TFs..
   if(max_contr == 0) {
     # add all remaining cell-types to the df
-    remaining <- rbind(data.frame(cell_type=cell_types, 
+    remaining <- rbind(data.frame(cell_type=cell_types,
                            number_contr_tfs=rep(0, length(cell_types)),
                            contr_tfs=rep(NA, length(cell_types)),
                            stringsAsFactors = F))
@@ -300,10 +168,10 @@ We further add the cell type labels to each data point using the *geom_text()* g
 
 {% highlight r %}
 df_sub <- subset(df, number_contr_tfs > 0)
-ggplot(df_sub, aes(x=1:nrow(df_sub), y=cumsum(number_contr_tfs))) + 
-  geom_line() + 
-  geom_point(size=2) + 
-  geom_text(aes(label=cell_type), vjust=0, hjust=-0.5, check_overlap = F, angle=-25) + 
+ggplot(df_sub, aes(x=1:nrow(df_sub), y=cumsum(number_contr_tfs))) +
+  geom_line() +
+  geom_point(size=2) +
+  geom_text(aes(label=cell_type), vjust=0, hjust=-0.5, check_overlap = F, angle=-25) +
   scale_y_continuous(limits=c(0,500)) +
   labs(title="Cumulative sum of number of new TFs contributed by each cell-type",
        subtitle = "Sorted by total contribution",
@@ -311,21 +179,14 @@ ggplot(df_sub, aes(x=1:nrow(df_sub), y=cumsum(number_contr_tfs))) +
        x="Cell type")
 {% endhighlight %}
 
-![center](/assets/figures/2019-06-18-remap-scraper/unnamed-chunk-4-1.png)
+<img src="/assets/figures/2019-06-18-remap-scraper/unnamed-chunk-4-1.png" title="center" alt="center" style="display: block; margin: auto;" />
 
 # Summary
-That's all! This was a quick (not necessarily dirty) way of extracting a HTML table from a website and generating a brief overview.
-
+That's all! This was a quick (not **necessarily** dirty) way of extracting a HTML table from a website and generating a brief overview.
 
 Until then, farewell!
 
 # Session Info
-
-{% highlight r %}
-sessionInfo()
-{% endhighlight %}
-
-
 
 {% highlight text %}
 ## R version 3.5.1 (2018-07-02)
@@ -363,4 +224,3 @@ sessionInfo()
 ## [41] utf8_1.1.4       stringi_1.4.3    lazyeval_0.2.2   munsell_0.5.0   
 ## [45] broom_0.5.2      crayon_1.3.4
 {% endhighlight %}
-
