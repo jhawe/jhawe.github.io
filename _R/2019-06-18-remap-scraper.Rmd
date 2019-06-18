@@ -1,0 +1,148 @@
+---
+title: "REMAP scraper"
+author: "Johann Hawe"
+date: "June 18, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+In this short document we use the XML package to obtain and parse an HTML table from [REMAP](http://tagc.univ-mrs.fr/remap/index.php?page=ct). This table contains an overview over cell-lines and transcription-factor (TF) binding sites measured in these cell-types.
+We further create an overview on the number of TFs per cell-types, generating a plot which shows the number of TFs, accumulated over all cell-types. The order is such that we start with the cell-types having the most TFs available and proceed with the one adding most new TFs and so forth.
+
+#Implementation
+
+## Data processing
+First, we load needed libraries and read in the table. We could optionally save the table as a TSV to disc.
+
+> NOTE: We load the cowplot package only to get a nice and lightweight default theme for ggplot set up. Also,
+> I can really recommend the package for publication ready figures.
+
+```{r}
+library(tidyverse)
+library(cowplot)
+library(XML)
+
+# read and extract HTML table
+remap <- readHTMLTable("http://tagc.univ-mrs.fr/remap/index.php?page=ct")[[1]] %>%
+  as_tibble(.name_repair = "universal")
+remap
+
+# Optional: write obtained data to disc
+#write_tsv(remap, "remap_celltype_tfs.tsv")
+```
+
+This was easy enough, we got the table and transformed it into a tibble, getting nicer column names on the way.
+
+> NOTE: the *readHTMLTable* returns actually a list of results it finds. We instantly subset the list and only retrieve the first element, which is the main table in our case
+
+In the next step, we separate the table by the TFs in each row (using the *separate_rows()* method). This yields for each cell type individual rows for each available TF.
+
+```{r}
+# separate
+remap_sep <- remap %>%
+  separate_rows(Transcription.Factor)
+
+# count TFs per cell type
+remap_counts <- remap_sep %>% group_by(Cell.Type) %>%
+  summarize(count = n()) %>%
+  arrange(desc(count))
+remap_counts
+```
+
+We can see that the cell-type with the most TFs measured is the K562 (used in [ENCODE](https://www.encodeproject.org/)), closely followed by the GM12878 LCL cell-line.
+
+Finally, we generate the cumulative numbers we want to plot in the end. Since we always want to add only the cell-line contributing most TFs in  each step, we do this manually and evaluate the overlap of the TF lists on the way. This might be a somewhat crude implementation, but it does the job.
+
+```{r}
+# list of cell types to process
+cell_types <- as.character(remap_counts$Cell.Type)
+
+# get all TFs available fro the first cell-type (which has 
+# the maximum number of TFs since we use the sorted list)
+tfs <- remap_sep %>% filter(Cell.Type == cell_types[1]) %>%
+  select(Transcription.Factor) %>% 
+  unlist(use.names=F)
+
+# prepare result df
+df <- data.frame(cell_type=cell_types[1], 
+                 number_contr_tfs=length(tfs), 
+                 contr_tfs=paste0(tfs, collapse=","),
+                 stringsAsFactors = F)
+
+# remove the first cell type, iterate over all others
+# as long as we've got some still left unprocessed
+cell_types <- cell_types[-1]
+while(length(cell_types) > 0) {
+  max_contr <- -1
+  max_contr_ct <- NA_character_
+  max_contr_tfs <- NA_character_
+  
+  # check each remaining cell_type for max contribution
+  for(i in 1:length(cell_types)) {
+    ct_tfs <- filter(remap_sep, Cell.Type == cell_types[i]) %>%
+      select(Transcription.Factor) %>% 
+      unlist(use.names=F)
+    # how many are not yet in the list of all tfs?
+    new_tfs <- setdiff(ct_tfs, tfs)
+    nnew_tfs <- length(new_tfs)
+    if(nnew_tfs > max_contr) {
+      max_contr <- nnew_tfs
+      max_contr_tfs <- new_tfs
+      max_contr_ct <- cell_types[i]
+    }
+  }
+  
+  # in that case, we didn't have any new TFs..
+  if(max_contr == 0) {
+    # add all remaining cell-types to the df
+    remaining <- rbind(data.frame(cell_type=cell_types, 
+                           number_contr_tfs=rep(0, length(cell_types)),
+                           contr_tfs=rep(NA, length(cell_types)),
+                           stringsAsFactors = F))
+    df <- rbind(df, remaining)
+    break
+  }
+  # remember the most contributing cell type
+  row <- c(max_contr_ct, max_contr, paste0(max_contr_tfs, collapse=","))
+  tfs <- c(tfs, max_contr_tfs)
+  df <- rbind.data.frame(df, row)
+  cell_types <- setdiff(cell_types, max_contr_ct)
+}
+
+
+```
+
+## Plotting
+
+Now we can use the accumulated TF contributions for plotting with [ggplot](https://ggplot2.tidyverse.org/).
+We filter for contributions $\gt 0$ and calculate the cumulative sum for the y-axis.
+We further add the cell type labels to each data point using the *geom_text()* ggplot layer.
+
+```{r}
+df_sub <- subset(df, number_contr_tfs > 0)
+ggplot(df_sub, aes(x=1:nrow(df_sub), y=cumsum(number_contr_tfs))) + 
+  geom_line() + 
+  geom_point(size=2) + 
+  geom_text(aes(label=cell_type), vjust=0, hjust=-0.5, check_overlap = F, angle=-25) + 
+  scale_y_continuous(limits=c(0,500)) +
+  labs(title="Cumulative sum of number of new TFs contributed by each cell-type",
+       subtitle = "Sorted by total contribution",
+       y="Cumulative sum of TF contributions",
+       x="Cell type")
+```
+
+# Summary
+That's all! This was a quick (not necessarily dirty) way of extracting a HTML table from a website and generating a brief overview.
+
+
+Until then, farewell!
+
+# Session Info
+```{r}
+sessionInfo()
+```
+
