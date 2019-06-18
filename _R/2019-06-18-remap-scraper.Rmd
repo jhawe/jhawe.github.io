@@ -46,9 +46,9 @@ remap
 
 This was easy enough, we got the table and transformed it into a tibble, getting nicer column names on the way.
 
-> NOTE: the *readHTMLTable* returns actually a list of results it finds. We instantly subset the list and only retrieve the first element, which is the main table in our case
+> NOTE: the *readHTMLTable* actually returns a *list* of results it finds. We instantly subset the list and only retrieve the first element, which, in our case, is the main table.
 
-In the next step, we separate the table by the TFs in each row (using the *separate_rows()* method). This yields for each cell type individual rows for each available TF.
+Since all TFs are gathered in a single cell for each cell-type, in the next step we separate the table by the TFs in each row, using the very convenient *separate_rows()* method. This method expands each row into multiple rows, based on the values of a string split generated from the values of a specific column. For us, this yields for each cell-type individual rows for each available TF.
 
 ```{r echo=T}
 # separate

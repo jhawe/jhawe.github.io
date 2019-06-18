@@ -66,9 +66,9 @@ remap
 
 This was easy enough, we got the table and transformed it into a tibble, getting nicer column names on the way.
 
-> NOTE: the *readHTMLTable* returns actually a list of results it finds. We instantly subset the list and only retrieve the first element, which is the main table in our case
+> NOTE: the *readHTMLTable* actually returns a *list* of results it finds. We instantly subset the list and only retrieve the first element, which, in our case, is the main table.
 
-In the next step, we separate the table by the TFs in each row (using the *separate_rows()* method). This yields for each cell type individual rows for each available TF.
+Since all TFs are gathered in a single cell for each cell-type, in the next step we separate the table by the TFs in each row, using the very convenient *separate_rows()* method. This method expands each row into multiple rows, based on the values of a string split generated from the values of a specific column. For us, this yields for each cell-type individual rows for each available TF.
 
 
 {% highlight r %}
@@ -209,52 +209,24 @@ Until then, farewell!
 ## [5] LC_TIME=English_United States.1252    
 ## 
 ## attached base packages:
-##  [1] grid      parallel  stats4    stats     graphics  grDevices utils    
-##  [8] datasets  methods   base     
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] XML_3.98-1.20                     BSgenome.Hsapiens.UCSC.hg19_1.4.0
-##  [3] BSgenome_1.48.0                   rtracklayer_1.40.6               
-##  [5] Biostrings_2.48.0                 XVector_0.20.0                   
-##  [7] cowplot_0.9.4                     RColorBrewer_1.1-2               
-##  [9] gridExtra_2.3                     GenomicRanges_1.32.7             
-## [11] GenomeInfoDb_1.16.0               IRanges_2.14.12                  
-## [13] S4Vectors_0.18.3                  BiocGenerics_0.26.0              
-## [15] reshape2_1.4.3                    forcats_0.4.0                    
-## [17] stringr_1.4.0                     dplyr_0.8.0.1                    
-## [19] purrr_0.3.2                       readr_1.3.1                      
-## [21] tidyr_0.8.3                       tibble_2.1.1                     
-## [23] ggplot2_3.1.1                     tidyverse_1.2.1                  
-## [25] knitr_1.22                       
+##  [1] XML_3.98-1.20   cowplot_0.9.4   forcats_0.4.0   stringr_1.4.0  
+##  [5] dplyr_0.8.0.1   purrr_0.3.2     readr_1.3.1     tidyr_0.8.3    
+##  [9] tibble_2.1.1    ggplot2_3.1.1   tidyverse_1.2.1 knitr_1.22     
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] Biobase_2.40.0              httr_1.4.0                 
-##  [3] jsonlite_1.6                modelr_0.1.4               
-##  [5] assertthat_0.2.1            highr_0.8                  
-##  [7] GenomeInfoDbData_1.1.0      cellranger_1.1.0           
-##  [9] Rsamtools_1.32.3            pillar_1.4.1               
-## [11] backports_1.1.4             lattice_0.20-35            
-## [13] glue_1.3.1                  rvest_0.3.3                
-## [15] colorspace_1.4-1            Matrix_1.2-14              
-## [17] plyr_1.8.4                  pkgconfig_2.0.2            
-## [19] broom_0.5.2                 haven_2.1.0                
-## [21] zlibbioc_1.26.0             scales_1.0.0               
-## [23] BiocParallel_1.14.2         generics_0.0.2             
-## [25] withr_2.1.2                 SummarizedExperiment_1.10.1
-## [27] lazyeval_0.2.2              cli_1.1.0                  
-## [29] magrittr_1.5                crayon_1.3.4               
-## [31] readxl_1.3.1                evaluate_0.13              
-## [33] fansi_0.4.0                 nlme_3.1-137               
-## [35] xml2_1.2.0                  tools_3.5.1                
-## [37] hms_0.4.2                   matrixStats_0.54.0         
-## [39] munsell_0.5.0               DelayedArray_0.6.6         
-## [41] compiler_3.5.1              rlang_0.3.4                
-## [43] RCurl_1.95-4.12             rstudioapi_0.10            
-## [45] bitops_1.0-6                labeling_0.3               
-## [47] gtable_0.3.0                R6_2.4.0                   
-## [49] GenomicAlignments_1.16.0    lubridate_1.7.4            
-## [51] zeallot_0.1.0               utf8_1.1.4                 
-## [53] stringi_1.4.3               Rcpp_1.0.1                 
-## [55] vctrs_0.1.0                 tidyselect_0.2.5           
-## [57] xfun_0.6
+##  [1] Rcpp_1.0.1       highr_0.8        cellranger_1.1.0 pillar_1.4.1    
+##  [5] compiler_3.5.1   plyr_1.8.4       tools_3.5.1      zeallot_0.1.0   
+##  [9] jsonlite_1.6     lubridate_1.7.4  evaluate_0.13    nlme_3.1-137    
+## [13] gtable_0.3.0     lattice_0.20-35  pkgconfig_2.0.2  rlang_0.3.4     
+## [17] cli_1.1.0        rstudioapi_0.10  haven_2.1.0      xfun_0.6        
+## [21] withr_2.1.2      xml2_1.2.0       httr_1.4.0       vctrs_0.1.0     
+## [25] generics_0.0.2   hms_0.4.2        grid_3.5.1       tidyselect_0.2.5
+## [29] glue_1.3.1       R6_2.4.0         fansi_0.4.0      readxl_1.3.1    
+## [33] modelr_0.1.4     magrittr_1.5     backports_1.1.4  scales_1.0.0    
+## [37] rvest_0.3.3      assertthat_0.2.1 colorspace_1.4-1 labeling_0.3    
+## [41] utf8_1.1.4       stringi_1.4.3    lazyeval_0.2.2   munsell_0.5.0   
+## [45] broom_0.5.2      crayon_1.3.4
 {% endhighlight %}
