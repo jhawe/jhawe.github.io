@@ -1,7 +1,7 @@
 ---
 title: "A ReMAP scraping script"
 date: "June 18, 2019"
-excerpt: "A brief script to download and present REMAP cell line transcription factor information"
+excerpt: "A brief script to scrape and present REMAP cell line / transcription factor information"
 tags: "remap transcription factor celltype xml table parsing"
 toc: true
 permalink: /remap-scraping/
@@ -13,12 +13,17 @@ permalink: /remap-scraping/
 In this short document we use the XML package to obtain and parse an HTML table from [REMAP](http://tagc.univ-mrs.fr/remap/index.php?page=ct). This table contains an overview over cell-lines and transcription-factor (TF) binding sites measured in these cell-types.
 We further create an overview on the number of TFs per cell-types, generating a plot which shows the number of TFs, accumulated over all cell-types. The order is such that we start with the cell-types having the most TFs available and proceed with the one adding most new TFs and so forth.
 
-#Implementation
+## REMAP
+[REMAP](http://tagc.univ-mrs.fr/remap/index.php?page=ct) is a huge resource which collects TF binding sites (TFBS) for numerous TFs and for hundreds of cell-types. These TFBS are ChIP-seq based, an experimental protocol which enables a genome-wide readout of DNA sites which are bound by
+specific transcription factors. The current version (2018) contains over 80 million
+TFBS for 485 TFs identified in 346 cell-types.
+
+# Implementation
 
 ## Data processing
 First, we load needed libraries and read in the table. We could optionally save the table as a TSV to disc.
 
-> NOTE: We load the cowplot package only to get a nice and lightweight default theme for ggplot set up. Also,
+> NOTE: We load the *cowplot* package only to get a nice and lightweight default theme for ggplot set up. Also,
 > I can really recommend the package for publication ready figures.
 
 
@@ -97,16 +102,17 @@ remap_counts
 ## # ... with 336 more rows
 {% endhighlight %}
 
-We can see that the cell-type with the most TFs measured is the K562 (used in [ENCODE](https://www.encodeproject.org/)), closely followed by the GM12878 LCL cell-line.
+We can see that the cell-type with the most TFs measured is the K562 (used in [ENCODE](https://www.encodeproject.org/)), closely followed by the GM12878 LCL cell-line. In fact,
+most of the *top* cell-types were used in ENCODE.
 
-Finally, we generate the cumulative numbers we want to plot in the end. Since we always want to add only the cell-line contributing most TFs in  each step, we do this manually and evaluate the overlap of the TF lists on the way. This might be a somewhat crude implementation, but it does the job.
+Finally, we generate the cumulative numbers we want to plot in the end. Since we always want to add only the cell-line contributing most TFs in each step, we do this manually and evaluate the overlap of the TF lists on the way. This might be a somewhat crude implementation, but it does the job. If you know a shortcut for achieving this, let me know!
 
 
 {% highlight r %}
 # list of cell types to process
 cell_types <- as.character(remap_counts$Cell.Type)
 
-# get all TFs available fro the first cell-type (which has
+# get all TFs available for the first cell-type (which has
 # the maximum number of TFs since we use the sorted list)
 tfs <- remap_sep %>% filter(Cell.Type == cell_types[1]) %>%
   select(Transcription.Factor) %>%
@@ -162,7 +168,7 @@ while(length(cell_types) > 0) {
 ## Plotting
 
 Now we can use the accumulated TF contributions for plotting with [ggplot](https://ggplot2.tidyverse.org/).
-We filter for contributions $\gt 0$ and calculate the cumulative sum for the y-axis.
+We filter for contributions > 0 and calculate the cumulative sum for the y-axis.
 We further add the cell type labels to each data point using the *geom_text()* ggplot layer.
 
 
@@ -203,24 +209,52 @@ Until then, farewell!
 ## [5] LC_TIME=English_United States.1252    
 ## 
 ## attached base packages:
-## [1] stats     graphics  grDevices utils     datasets  methods   base     
+##  [1] grid      parallel  stats4    stats     graphics  grDevices utils    
+##  [8] datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] XML_3.98-1.20   cowplot_0.9.4   forcats_0.4.0   stringr_1.4.0  
-##  [5] dplyr_0.8.0.1   purrr_0.3.2     readr_1.3.1     tidyr_0.8.3    
-##  [9] tibble_2.1.1    ggplot2_3.1.1   tidyverse_1.2.1 knitr_1.22     
+##  [1] XML_3.98-1.20                     BSgenome.Hsapiens.UCSC.hg19_1.4.0
+##  [3] BSgenome_1.48.0                   rtracklayer_1.40.6               
+##  [5] Biostrings_2.48.0                 XVector_0.20.0                   
+##  [7] cowplot_0.9.4                     RColorBrewer_1.1-2               
+##  [9] gridExtra_2.3                     GenomicRanges_1.32.7             
+## [11] GenomeInfoDb_1.16.0               IRanges_2.14.12                  
+## [13] S4Vectors_0.18.3                  BiocGenerics_0.26.0              
+## [15] reshape2_1.4.3                    forcats_0.4.0                    
+## [17] stringr_1.4.0                     dplyr_0.8.0.1                    
+## [19] purrr_0.3.2                       readr_1.3.1                      
+## [21] tidyr_0.8.3                       tibble_2.1.1                     
+## [23] ggplot2_3.1.1                     tidyverse_1.2.1                  
+## [25] knitr_1.22                       
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] Rcpp_1.0.1       highr_0.8        cellranger_1.1.0 pillar_1.4.1    
-##  [5] compiler_3.5.1   plyr_1.8.4       tools_3.5.1      zeallot_0.1.0   
-##  [9] jsonlite_1.6     lubridate_1.7.4  evaluate_0.13    nlme_3.1-137    
-## [13] gtable_0.3.0     lattice_0.20-35  pkgconfig_2.0.2  rlang_0.3.4     
-## [17] cli_1.1.0        rstudioapi_0.10  haven_2.1.0      xfun_0.6        
-## [21] withr_2.1.2      xml2_1.2.0       httr_1.4.0       vctrs_0.1.0     
-## [25] generics_0.0.2   hms_0.4.2        grid_3.5.1       tidyselect_0.2.5
-## [29] glue_1.3.1       R6_2.4.0         fansi_0.4.0      readxl_1.3.1    
-## [33] modelr_0.1.4     magrittr_1.5     backports_1.1.4  scales_1.0.0    
-## [37] rvest_0.3.3      assertthat_0.2.1 colorspace_1.4-1 labeling_0.3    
-## [41] utf8_1.1.4       stringi_1.4.3    lazyeval_0.2.2   munsell_0.5.0   
-## [45] broom_0.5.2      crayon_1.3.4
+##  [1] Biobase_2.40.0              httr_1.4.0                 
+##  [3] jsonlite_1.6                modelr_0.1.4               
+##  [5] assertthat_0.2.1            highr_0.8                  
+##  [7] GenomeInfoDbData_1.1.0      cellranger_1.1.0           
+##  [9] Rsamtools_1.32.3            pillar_1.4.1               
+## [11] backports_1.1.4             lattice_0.20-35            
+## [13] glue_1.3.1                  rvest_0.3.3                
+## [15] colorspace_1.4-1            Matrix_1.2-14              
+## [17] plyr_1.8.4                  pkgconfig_2.0.2            
+## [19] broom_0.5.2                 haven_2.1.0                
+## [21] zlibbioc_1.26.0             scales_1.0.0               
+## [23] BiocParallel_1.14.2         generics_0.0.2             
+## [25] withr_2.1.2                 SummarizedExperiment_1.10.1
+## [27] lazyeval_0.2.2              cli_1.1.0                  
+## [29] magrittr_1.5                crayon_1.3.4               
+## [31] readxl_1.3.1                evaluate_0.13              
+## [33] fansi_0.4.0                 nlme_3.1-137               
+## [35] xml2_1.2.0                  tools_3.5.1                
+## [37] hms_0.4.2                   matrixStats_0.54.0         
+## [39] munsell_0.5.0               DelayedArray_0.6.6         
+## [41] compiler_3.5.1              rlang_0.3.4                
+## [43] RCurl_1.95-4.12             rstudioapi_0.10            
+## [45] bitops_1.0-6                labeling_0.3               
+## [47] gtable_0.3.0                R6_2.4.0                   
+## [49] GenomicAlignments_1.16.0    lubridate_1.7.4            
+## [51] zeallot_0.1.0               utf8_1.1.4                 
+## [53] stringi_1.4.3               Rcpp_1.0.1                 
+## [55] vctrs_0.1.0                 tidyselect_0.2.5           
+## [57] xfun_0.6
 {% endhighlight %}

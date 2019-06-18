@@ -1,7 +1,7 @@
 ---
 title: "A ReMAP scraping script"
 date: "June 18, 2019"
-excerpt: "A brief script to download and present REMAP cell line transcription factor information"
+excerpt: "A brief script to scrape and present REMAP cell line / transcription factor information"
 tags: "remap transcription factor celltype xml table parsing"
 toc: true
 permalink: /remap-scraping/
@@ -17,12 +17,17 @@ knitr::opts_chunk$set(echo = FALSE, fig.align="center",
 In this short document we use the XML package to obtain and parse an HTML table from [REMAP](http://tagc.univ-mrs.fr/remap/index.php?page=ct). This table contains an overview over cell-lines and transcription-factor (TF) binding sites measured in these cell-types.
 We further create an overview on the number of TFs per cell-types, generating a plot which shows the number of TFs, accumulated over all cell-types. The order is such that we start with the cell-types having the most TFs available and proceed with the one adding most new TFs and so forth.
 
-#Implementation
+## REMAP
+[REMAP](http://tagc.univ-mrs.fr/remap/index.php?page=ct) is a huge resource which collects TF binding sites (TFBS) for numerous TFs and for hundreds of cell-types. These TFBS are ChIP-seq based, an experimental protocol which enables a genome-wide readout of DNA sites which are bound by
+specific transcription factors. The current version (2018) contains over 80 million
+TFBS for 485 TFs identified in 346 cell-types.
+
+# Implementation
 
 ## Data processing
 First, we load needed libraries and read in the table. We could optionally save the table as a TSV to disc.
 
-> NOTE: We load the cowplot package only to get a nice and lightweight default theme for ggplot set up. Also,
+> NOTE: We load the *cowplot* package only to get a nice and lightweight default theme for ggplot set up. Also,
 > I can really recommend the package for publication ready figures.
 
 ```{r echo=T}
@@ -57,15 +62,16 @@ remap_counts <- remap_sep %>% group_by(Cell.Type) %>%
 remap_counts
 ```
 
-We can see that the cell-type with the most TFs measured is the K562 (used in [ENCODE](https://www.encodeproject.org/)), closely followed by the GM12878 LCL cell-line.
+We can see that the cell-type with the most TFs measured is the K562 (used in [ENCODE](https://www.encodeproject.org/)), closely followed by the GM12878 LCL cell-line. In fact,
+most of the *top* cell-types were used in ENCODE.
 
-Finally, we generate the cumulative numbers we want to plot in the end. Since we always want to add only the cell-line contributing most TFs in  each step, we do this manually and evaluate the overlap of the TF lists on the way. This might be a somewhat crude implementation, but it does the job.
+Finally, we generate the cumulative numbers we want to plot in the end. Since we always want to add only the cell-line contributing most TFs in each step, we do this manually and evaluate the overlap of the TF lists on the way. This might be a somewhat crude implementation, but it does the job. If you know a shortcut for achieving this, let me know!
 
 ```{r echo=T}
 # list of cell types to process
 cell_types <- as.character(remap_counts$Cell.Type)
 
-# get all TFs available fro the first cell-type (which has
+# get all TFs available for the first cell-type (which has
 # the maximum number of TFs since we use the sorted list)
 tfs <- remap_sep %>% filter(Cell.Type == cell_types[1]) %>%
   select(Transcription.Factor) %>%
@@ -121,7 +127,7 @@ while(length(cell_types) > 0) {
 ## Plotting
 
 Now we can use the accumulated TF contributions for plotting with [ggplot](https://ggplot2.tidyverse.org/).
-We filter for contributions $\gt 0$ and calculate the cumulative sum for the y-axis.
+We filter for contributions > 0 and calculate the cumulative sum for the y-axis.
 We further add the cell type labels to each data point using the *geom_text()* ggplot layer.
 
 ```{r echo=T}
