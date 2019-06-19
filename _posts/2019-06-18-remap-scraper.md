@@ -61,10 +61,10 @@ remap
 
 {% highlight r %}
 # Optional: write obtained data to disc
-#write_tsv(remap, "remap_celltype_tfs.tsv")
+write_tsv(remap, "../downloads/remap_celltype_tfs.tsv")
 {% endhighlight %}
 
-This was easy enough, we got the table and transformed it into a tibble, getting nicer column names on the way.
+This was easy enough, we got the table and transformed it into a tibble, getting nicer column names on the way. You can download the transformed table [from here](downloads/remap_celltype_tfs.tsv).
 
 > NOTE: the *readHTMLTable* actually returns a *list* of results it finds. We instantly subset the list and only retrieve the first element, which, in our case, is the main table.
 
