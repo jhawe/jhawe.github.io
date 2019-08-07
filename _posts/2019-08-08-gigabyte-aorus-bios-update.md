@@ -24,8 +24,8 @@ processor. For this, I obtained a 'CPU bootkit' (see [here](https://www.amd.com/
 > NOTE 2: Be aware that not every mobo supports the new Ryzens from the start and that a firmware update might be required!
 
 ## Problem description
-After downloading the (what I thought..) *correct* BIOS version, every time I entered the BIOS and tried to flash the BIOS (pressing F8 to access the Q-Flash utility)
-I go the 'BIOS ID check error'.. that. sucked.
+After downloading the (what I thought..) *correct*  BIOS version, every time I entered the BIOS and tried to flash the BIOS (pressing F8 to access the Q-Flash utility)
+I got the 'BIOS ID check error'.. that sucked, as you can imagine.
 Even after trying several different BIOS versions in addition to a collection of different USB devices (which is suggested in some online forums), 
 I couldn't get the new BIOS version to install (original was F30, my target version was F40 to enable the 3rd Gen Ryzen).
 
