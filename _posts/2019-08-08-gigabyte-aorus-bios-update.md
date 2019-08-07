@@ -2,7 +2,7 @@
 title: Q-Flash for Gigabyte B450 I AORUS PRO WIFI
 permalink: /flash-bios-b450-i-aorus-pro-wifi/
 excerpt: Brief description of how to update/flash the BIOS of the B450 I AORUS PRO WIFI while avoiding the 'BIOS ID check error'
-tags: b450,aorus,gigabyte,bios,update,flash,id check
+tags: b450 aorus gigabyte bios update flash id
 ---
 
 ## Motivation
