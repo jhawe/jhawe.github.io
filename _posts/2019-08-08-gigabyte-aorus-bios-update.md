@@ -21,7 +21,7 @@ processor. For this, I obtained a 'CPU bootkit' (see [here](https://www.amd.com/
 > NOTE 1: really nice from AMD: just write them, make it clear that you need an 'old' CPU for flashing the BIOS and they'll send you one 
 > (of course: you have to send it back once your're done)
 
-> NOTE 2: Be aware that not every mobo supports the new Ryzens from the start and that a firmware update might be required!
+> NOTE 2: Be aware that not every mainboard supports the new Ryzens from the start and that a firmware update might be required!
 
 ## Problem description
 After downloading the (what I thought..) *correct*  BIOS version, every time I entered the BIOS and tried to flash the BIOS (pressing F8 to access the Q-Flash utility)
@@ -39,9 +39,9 @@ See the difference? I didn't either,.. at first. Turns out there are two very si
 * B450 AORUS PRO WIFI (rev 1.0)
 
 Of course, I have the first one since I built a mini-ITX system, however, when looking for the BIOS updates
-I neglected the 'I' completely, leading to the failed attempts of updateing the BIOS.
+I neglected the 'I' completely, leading to the failed attempts of updating the BIOS.
 
-After downloading simply the updates for the correct mobo, it all worked like a charm...
+After downloading the updates for the correct mobo, simple as that, it all worked like a charm...
 
 ## Summary
 Well, really only one thing to say:
