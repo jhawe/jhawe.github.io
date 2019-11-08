@@ -2,7 +2,7 @@
 title: About
 permalink: /about/
 excerpt: The about page describing Just Analyzed!'s inspiration and basic technology used
-tags: about,johann hawe,data science,kaggle,R
+tags: about johann hawe data-science kaggle R
 ---
 
 This page and its contents are created by me: the guy on the left!
