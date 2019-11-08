@@ -28,13 +28,15 @@ search: true
 # Build settings
 markdown: kramdown
 #theme: minimal-mistakes-jekyll
-remote_theme: mmistakes/minimal-mistakes
+remote_theme: mmistakes/minimal-mistakes@4.17.2
 minimal_mistakes_skin: "dark" # "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum" "sunrise"
 plugins:
   - jekyll-remote-theme
   - jekyll-feed
   - jekyll-include-cache
   - jekyll-sitemap
+  - jekyll-seo-tag
+
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list
 # to override the default setting.
