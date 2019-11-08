@@ -25,3 +25,4 @@ out the R-studio [cheatsheets](https://github.com/rstudio/cheatsheets).
 This homepage is hosted using [GitHub pages](https://pages.github.com/)
 and built using [jekyll](https://jekyllrb.com/) and it's
 [minimal mistakes theme](https://mmistakes.github.io/minimal-mistakes/).
+To install jekyll, check out [this documentation](https://jekyllrb.com/docs/installation/ubuntu/).
