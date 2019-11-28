@@ -7,7 +7,7 @@ tags: about johann hawe data-science kaggle R
 
 This page and its contents are created by me: the guy on the left!
 
-It's about data science and having fun with public and interesting datasets
+It's about myself, data science and having fun with public and interesting datasets
 from [Kaggle](https://www.kaggle.com) using [R](www.r-project.de).
 Spoiler alert: I'll sporadically talk about or include references to other stuff
 I'm interested in, such as specific music, sports and other more 'non-sciency'

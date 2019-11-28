@@ -2,7 +2,7 @@
 title: Publications
 permalink: /publications/
 excerpt: This page simply contains a flat list of publications Johann Hawe (co-)authored
-tags: about,johann hawe,data science,publications
+tags: about johann hawe data science publications
 ---
 
 Okidoki, here now an up-to-date list of publications I (co-)authored, in chronological order,
