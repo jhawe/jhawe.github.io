@@ -4,6 +4,10 @@ main:
     url: /
   - title: "Publications"
     url: /publications/
+  - title: "Rstudio and charliecloud"
+    url: /rstudio-server-and-charliecloud/
+  - title: "Charliecloud from docker"
+    url: /exporting-charliecloud-from-docker/
   - title: "B450 I Aorus PRO Wifi BIOS Update"
     url: /flash-bios-b450-i-aorus-pro-wifi/
   - title: "Genome-wide pairs matrix"
