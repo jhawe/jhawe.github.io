@@ -39,22 +39,12 @@ The most crucial point is to fake authentication for the Rstudio server (which w
 First, put this into a script (e.g. `r-auth.sh`) and copy the script to the image, e.g. under `/bin/r-auth.sh`. This will handle the authentication step, checking the username and the password set in the `RSTUDIO_PASSWORD` environment variable (set in the next script):
 
 
-{% highlight text %}
-## Usage: auth USERNAME
-{% endhighlight %}
 
 Once this is done, it is relatively simple to start the server.
 You can use the following script to do so (you might want to put it also into the charliecloud image for convenience, e.g. under `/bin/start-rstudio.sh`).
 Essentially, we just execute the `rserver` binary, specifying the 'fake authentication' script as an authentication helper and preparing the password beforehand:
 
 
-{% highlight text %}
-## Password for this session is:
-## 
-## 
-## Running RStudio server at port 
-## /bin/bash: line 20: /usr/lib/rstudio-server/bin/rserver: No such file or directory
-{% endhighlight %}
 
 The lines above will run the server and show the randomly generated password to the user.
 If you now access the server via a web browser (type the IP-address or name of the machine you run the server followed by the port specification in the address field, e.g. `http://server-name:8188` if you specified port-number `8188`) you see the Rstudio server login page. Type your usual user-name and provide the generated password shown in the terminal to login to your very own and secured R session!

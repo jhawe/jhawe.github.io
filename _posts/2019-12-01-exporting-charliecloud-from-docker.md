@@ -20,9 +20,6 @@ You have to have docker installed on your system and the docker service/daemon n
 Here is an example on how you can build a container, simply call the `docker build` command from a terminal window and provide the path to the dockerfile via `-f <./path/to/file>` and a nice name via `-t <name>`):
 
 
-{% highlight text %}
-## unable to prepare context: unable to evaluate symlinks in Dockerfile path: lstat /mnt/d/githup_repositories/jhawe.github.io/_R/dockerfiles: no such file or directory
-{% endhighlight %}
 
 Don't forget the `.` at the end of the command, otherwise docker will complain.
 
@@ -30,15 +27,7 @@ Don't forget the `.` at the end of the command, otherwise docker will complain.
 
 Now, to package the built image as a charliecloud-readable image tar-ball, you need to first `docker create` your image and then `docker export` it to a `*.tar`-file. Finally, you can `gzip` it to save some space, like so:
 
-```{}
-# where to put the image file
-mkdir ../images/
 
-# create image and save its id
-id=$(docker create nice_name)
-docker export $id > ../images/nice_name.tar
-gzip -c ../images/nice_name.tar > ../images/nice_name.tar.gz
-```
 
 The resulting `tar.gz` (in this example `nice_name.tar.gz`) file can then be transferred to e.g. a HPC server running charliecloud to make your very own software stack available there.
 
@@ -46,16 +35,6 @@ The resulting `tar.gz` (in this example `nice_name.tar.gz`) file can then be tra
 Naturally, the above commands can also be combined to make it even more straight forward to use:
 
 
-{% highlight text %}
-## "docker create" requires at least 1 argument.
-## See 'docker create --help'.
-## 
-## Usage:  docker create [OPTIONS] IMAGE [COMMAND] [ARG...]
-## 
-## Create a new container
-## invalid argument "." for "-t, --tag" flag: invalid reference format
-## See 'docker build --help'.
-{% endhighlight %}
 
 Wrap the above commands in a nice script (e.g. `export_image.sh`) to make your export as easy as possible!
 
