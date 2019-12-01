@@ -39,12 +39,67 @@ The most crucial point is to fake authentication for the Rstudio server (which w
 First, put this into a script (e.g. `r-auth.sh`) and copy the script to the image, e.g. under `/bin/r-auth.sh`. This will handle the authentication step, checking the username and the password set in the `RSTUDIO_PASSWORD` environment variable (set in the next script):
 
 
+{% highlight bash %}
+#!/usr/bin/env bash
+
+# Confirm username is supplied
+if [[ $# -ne 1 ]]; then
+  echo "Usage: auth USERNAME"
+  exit 1
+fi
+USERNAME="${1}"
+
+# Confirm password environment variable exists
+if [[ -z ${RSTUDIO_PASSWORD} ]]; then
+  echo "The environment variable RSTUDIO_PASSWORD is not set"
+  exit 1
+fi
+
+# Read in the password from user
+read -s -p "Password: " PASSWORD
+echo ""
+
+if [[ ${USERNAME} == ${USER} && ${PASSWORD} == ${RSTUDIO_PASSWORD} ]]; then
+  echo "Successful authentication"
+  exit 0
+else
+  echo "Invalid authentication"
+  exit 1
+fi
+{% endhighlight %}
 
 Once this is done, it is relatively simple to start the server.
 You can use the following script to do so (you might want to put it also into the charliecloud image for convenience, e.g. under `/bin/start-rstudio.sh`).
 Essentially, we just execute the `rserver` binary, specifying the 'fake authentication' script as an authentication helper and preparing the password beforehand:
 
 
+{% highlight bash %}
+#!/bin/bash
+
+# generate a new password to be used for the current user
+# Variable 'RSTUDIO_PASSWORD' must be set and is expected by authentication script
+password=$(openssl rand -base64 20)
+export RSTUDIO_PASSWORD=${password}
+
+echo "Password for this session is:"
+echo ${password}
+
+# this path has to match the path to the r-auth.sh script copied to the image!
+RSTUDIO_AUTH="/bin/r-auth.sh"
+
+# define port to be used
+port=8818
+
+echo ""
+echo "Running RStudio server at port ${port}"
+
+# run rstudio
+/usr/lib/rstudio-server/bin/rserver \
+  --www-port=${port} \
+  --auth-none=0 \
+  --auth-pam-helper-path=${RSTUDIO_AUTH} \
+  --auth-encrypt-password=0
+{% endhighlight %}
 
 The lines above will run the server and show the randomly generated password to the user.
 If you now access the server via a web browser (type the IP-address or name of the machine you run the server followed by the port specification in the address field, e.g. `http://server-name:8188` if you specified port-number `8188`) you see the Rstudio server login page. Type your usual user-name and provide the generated password shown in the terminal to login to your very own and secured R session!

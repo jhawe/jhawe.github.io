@@ -20,6 +20,9 @@ You have to have docker installed on your system and the docker service/daemon n
 Here is an example on how you can build a container, simply call the `docker build` command from a terminal window and provide the path to the dockerfile via `-f <./path/to/file>` and a nice name via `-t <name>`):
 
 
+{% highlight bash %}
+docker build -f ./dockerfiles/my_dockerfile -t nice_name .
+{% endhighlight %}
 
 Don't forget the `.` at the end of the command, otherwise docker will complain.
 
@@ -28,6 +31,15 @@ Don't forget the `.` at the end of the command, otherwise docker will complain.
 Now, to package the built image as a charliecloud-readable image tar-ball, you need to first `docker create` your image and then `docker export` it to a `*.tar`-file. Finally, you can `gzip` it to save some space, like so:
 
 
+{% highlight bash %}
+# where to put the image file
+mkdir ../images/
+
+# create image and save its id
+id=$(docker create nice_name)
+docker export $id > ../images/nice_name.tar
+gzip -c ../images/nice_name.tar > ../images/nice_name.tar.gz
+{% endhighlight %}
 
 The resulting `tar.gz` (in this example `nice_name.tar.gz`) file can then be transferred to e.g. a HPC server running charliecloud to make your very own software stack available there.
 
@@ -35,6 +47,16 @@ The resulting `tar.gz` (in this example `nice_name.tar.gz`) file can then be tra
 Naturally, the above commands can also be combined to make it even more straight forward to use:
 
 
+{% highlight bash %}
+mkdir ../images/
+
+# save the name in a variable
+image_name='nice_name'
+
+docker build -f ./dockerfiles/my_dockerfile -t ${image_name} . && \
+  docker export $(docker create ${image_name}) | \
+  gzip -c > ../images/${image_name}.tar.gz
+{% endhighlight %}
 
 Wrap the above commands in a nice script (e.g. `export_image.sh`) to make your export as easy as possible!
 

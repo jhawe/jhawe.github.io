@@ -9,7 +9,7 @@ permalink: /rstudio-server-and-charliecloud/
 
 ```{r setup, include=FALSE}
 # set options
-knitr::opts_chunk$set(echo = FALSE,  eval=FALSE, fig.align="center",
+knitr::opts_chunk$set(echo = TRUE,  eval=FALSE, fig.align="center",
   message = FALSE, warning=FALSE, fig_width=10)
 ```
 
