@@ -1,5 +1,5 @@
 ---
-title: "Using Rstudio server and charliecloud"
+title: "Using Rstudio server with charliecloud"
 date: "Dec 1, 2019"
 excerpt: "Explanation on how to run Rstudio server from within a charliecloud container"
 tags: "charliecloud rstudio server HPC SLURM R reproducibility"
@@ -8,6 +8,12 @@ permalink: /rstudio-server-and-charliecloud/
 ---
 
 
+
+# TLDR;
+We can run Rstudio server within charliecloud by performing 'fake authentication'
+of the Rstudio userm using a custom authentication script and running the `rserver`
+binary instead of the usual Rstudio service. I put together the needed scripts and an example dockerfile
+in [this repository](https://github.com/jhawe/rstudio-charliecloud).
 
 # Introduction
 This post is about how one can use [charliecloud](https://github.com/hpc/charliecloud) on a high-performance computing (HPC) environment running the [SLURM workload manager](https://slurm.schedmd.com/) to run an [Rstudio server](https://rstudio.com/products/rstudio/#rstudio-server).
