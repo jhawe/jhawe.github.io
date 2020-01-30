@@ -1,7 +1,7 @@
 ---
 title: Unix AWK madness
-permalink: /awk-numeric-madness/
-excerpt: A brief journey of using the unix AWK tool for filtering small numeric values
+permalink: /awk-numeric-conversion-madness/
+excerpt: A brief journey of using the Unix AWK tool for filtering small numeric values
 tags: awk unix filtering small exponential numeric values
 ---
 
