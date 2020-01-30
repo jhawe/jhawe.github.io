@@ -5,7 +5,7 @@ main:
   - title: "Publications"
     url: /publications/
   - title: "AWK numerics"
-    url: /awk-numeric-conversion-madness/
+    url: //awk-numeric-conversion-madness/
   - title: "Rstudio and charliecloud"
     url: /rstudio-server-and-charliecloud/
   - title: "Charliecloud from docker"
