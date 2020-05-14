@@ -27,3 +27,5 @@ this was entirely me not being knowledgeable enough to use `awk` properly...
 
 Just wanted to put this information out there, hope this helps someone encountering
 the same issue in the future!
+
+Until then, farewell!
