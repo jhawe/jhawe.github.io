@@ -29,7 +29,7 @@ search: true
 markdown: kramdown
 #theme: minimal-mistakes-jekyll
 remote_theme: mmistakes/minimal-mistakes@4.17.2
-minimal_mistakes_skin: "dark" # "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum" "sunrise"
+minimal_mistakes_skin: "contrast" # "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum" "sunrise"
 plugins:
   - jekyll-remote-theme
   - jekyll-feed
@@ -91,7 +91,7 @@ author:
   links:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
-      url: "mailto:johann.hawe@gmail.com"
+      url: "mailto:johann.hawe@protonmail.com"
     - label: "Website"
       icon: "fas fa-fw fa-link"
       url: "https://jhawe.github.io"
