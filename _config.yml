@@ -19,7 +19,7 @@ locale: en-US
 name: Johann Hawe
 email: johann.hawe@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
-         Analysis of public datasets in R.
+         About myself and nalysis of public datasets in R.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://jhawe.github.io/" # the base hostname & protocol for your site, e.g. http://example.com
 github_username: jhawe
@@ -85,8 +85,8 @@ defaults:
 author:
   name     : "Johann Hawe"
   avatar   : "/assets/images/avatar3.png"
-  bio      : "PhD student (computational biology)"
-  location : "Munich, Germany"
+  bio      : "Postdoctoral Research Fellow (computational biology)"
+  location : "Munich, Germany; Wasserburg, Germany"
   links:
   links:
     - label: "Email"
