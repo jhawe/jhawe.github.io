@@ -86,7 +86,7 @@ author:
   name     : "Johann Hawe"
   avatar   : "/assets/images/avatar3.png"
   bio      : "Postdoctoral Research Fellow (computational biology)"
-  location : "Munich, Germany; Wasserburg, Germany"
+  location : "Munich, Germany;<br/> Wasserburg, Germany"
   links:
   links:
     - label: "Email"
