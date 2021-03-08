@@ -17,6 +17,7 @@ gem 'jekyll-remote-theme'
 gem 'jekyll-include-cache'
 gem 'jekyll-sitemap'
 gem 'jekyll-seo-tag'
+gem "kramdown", ">= 2.3.0"
 
 # If you want to use GitHub Pages, remove the "gem "jekyll"" above and
 # uncomment the line below. To upgrade, run `bundle update github-pages`.
