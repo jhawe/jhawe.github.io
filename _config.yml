@@ -13,13 +13,13 @@
 # you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
-title: Just Analyzed!
+title: jhawe
 title_separator: "|"
 locale: en-US
 name: Johann Hawe
 email: johann.hawe@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
-         About myself and nalysis of public datasets in R.
+         About myself and analysis of public datasets in R.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://jhawe.github.io/" # the base hostname & protocol for your site, e.g. http://example.com
 github_username: jhawe
@@ -84,7 +84,7 @@ defaults:
 
 author:
   name     : "Johann Hawe"
-  avatar   : "/assets/images/avatar3.png"
+  avatar   : "/assets/images/avatar.png"
   bio      : "Postdoctoral Research Fellow (computational biology)"
   location : "Munich, Germany;<br/> Wasserburg, Germany"
   links:
